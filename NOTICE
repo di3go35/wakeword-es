@@ -1,0 +1,24 @@
+wakeword-es
+Copyright 2026 Diego (github.com/di3go35)
+
+Este producto incluye o se apoya en software y datos de terceros. Cada componente
+conserva su licencia, y la licencia del componente manda sobre este aviso.
+
+Software de referencia (no redistribuido en este repositorio salvo que se indique):
+  - openWakeWord (dscripka) — Apache-2.0. Fuente de la línea base y del candidato C.
+  - livekit-wakeword (LiveKit) — evidencia citada del límite multilingüe del backbone.
+  - microWakeWord (Kevin Ahrendt) — referencia arquitectónica; la licencia del proyecto
+    de origen no fue verificada en la sesión que redactó este aviso.
+  - onnx-wakeword (voicute) — referencia del mecanismo de post-proceso anti-falso-disparo.
+  - Google speech_embedding y el melspectrogram de openWakeWord — Apache-2.0.
+
+Modelos de texto a voz usados para generar datos sintéticos:
+  - Kokoro-82M (hexgrad) — Apache-2.0.
+  - Chatterbox Multilingual V3 y su finetune es-mx-latam (Resemble AI) — MIT.
+
+Datos:
+  - Mozilla Common Voice (español) — CC0. No se redistribuye aquí.
+  - MUSAN — CC BY 4.0 en conjunto, con fuentes mixtas; requiere auditoría ítem por ítem.
+
+La licencia de cada modelo entrenado y de cada dato derivado se declara en el registro de
+procedencia del proyecto, que es la autoridad sobre este archivo.

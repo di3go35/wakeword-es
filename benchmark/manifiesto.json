@@ -1,0 +1,29 @@
+{
+  "proyecto": "wakeword-es",
+  "descripcion": "Manifiesto del test congelado. El hash de este archivo se publica en benchmark/TEST_HASH y el banco de evaluación aborta si deja de coincidir.",
+  "estado": "pendiente_fase_5",
+  "nota": "Estructura provisional. El test real (clips, hashes por clip, condiciones y disjunción por hablante y por motor de TTS) se congela en la fase 5, antes del primer entrenamiento del modelo final. Este archivo existe ahora para que el mecanismo de congelado sea verificable desde el primer día.",
+  "frase": null,
+  "condiciones": ["limpio", "tv_10dB", "lejano_3m"],
+  "particiones": {
+    "publico_sintetico": {
+      "regla_disjuncion": ["hablante", "motor_tts"],
+      "positivos": null,
+      "negativos_horas": null
+    },
+    "privado_real": {
+      "positivos": null,
+      "negativos_horas": null,
+      "publicacion": "solo agregados y hashes"
+    }
+  },
+  "silencio": {
+    "duracion_s": 1800,
+    "activaciones_permitidas": 0
+  },
+  "criterio": {
+    "recall_minimo": 0.95,
+    "fa_h_max": 0.5,
+    "objetivos_fa_h_reportados": [0.2, 0.5, 1.0]
+  }
+}

@@ -31,6 +31,9 @@ quedó abierto está nombrado como pendiente al final.
 | 24 | Cómputo | Kaggle para todo el pipeline pesado; el VPS solo orquesta | VPS: 4 vCPU, 7,8 GB RAM, 73 GB libres, **sin GPU**, Python 3.14 (el pipeline estándar exige 3.10–3.12) | Cerrada |
 | 25 | Captura en Android | `AudioSource.VOICE_RECOGNITION` o `UNPROCESSED` (AGC y supresión desactivados por especificación), más test de paridad numérica Python ↔ Android | Compatibilidad Android 4.1 §5.3: con VOICE_RECOGNITION, reducción de ruido y AGC "MUST be disabled"; requisitos de respuesta plana ±3 dB de 100 Hz a 4 kHz | Cerrada |
 
+| 26 | Aprobación del plan | **Aprobado por Diego el 2026-10-17** («dale»). Es la fase 1 del plan y desbloquea la ejecución | Mensaje explícito de aprobación tras la Ronda 4 | Cerrada |
+| 27 | Definición de "activación" y del criterio | Una activación es un frame ≥ umbral que no cae dentro del debounce (cooldown por defecto 1,0 s). El criterio es **código ejecutable**: `--criterio` devuelve 1 si no se cumple, y el banco aborta con código 2 si el hash del manifiesto del test dejó de coincidir | `benchmark/evaluar.py`, `benchmark/README.md`; verificado con `make test` (12/12) y `make autotest` (perfil bueno cumple, perfil malo falla) | Cerrada |
+
 ## Pendientes (nombrados como pendientes, no decididos)
 
 1. **La frase exacta.** Se elegirá por medición en la fase 3; hoy no hay frase decidida.
