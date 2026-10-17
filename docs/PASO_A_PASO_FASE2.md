@@ -31,17 +31,44 @@ Pasos:
 1. Entra en `mozilladatacollective.com` y crea una cuenta (es gratuita; es una plataforma
    nueva, incubada por la Mozilla Foundation).
 2. Abre la ficha del dataset por ID: `mozilladatacollective.com/datasets/cmqim2spa00synr071fcp7av0`
-3. Comprueba que la ficha diga `cv-corpus-26.0-2026-06-12`, CC0-1.0 y 48,30 GB. Si te
-   ofrece variantes (por ejemplo solo el split validado), **elige la más pequeña que
-   incluya `validated.tsv`**; si solo hay una opción, son los 48,30 GB completos.
-4. Pulsa **Download** y acepta los términos si te los pide. Descarga al servidor, no a tu
-   laptop: `/home/di3gor35/datos-cv/` (73 GB libres allí y el `.gitignore` ya bloquea todo
-   audio).
-5. Verifica la descarga: que `validated.tsv` exista, que el número de clips tenga sentido
-   y que no haya archivos truncados (`find . -name '*.mp3' -size -1k | head`).
-6. **No lo re-hospedes en ningún sitio**: ni Kaggle, ni Hugging Face, ni un torrent. La
-   prohibición es explícita en la propia ficha. Lo único que puede salir de aquí son
-   **características derivadas** (embeddings), y en dataset privado; el audio no.
+3. **Acepta los términos en la web.** Este es el único paso que no se puede hacer por API:
+   la propia documentación dice que "el usuario debe haber aceptado previamente los
+   términos de uso del dataset mediante la interfaz web" y que la aceptación por API no
+   está soportada. Sin ese clic, la API responde `403 Access to this dataset has not been
+   granted` — comprobado el 2026-10-17 con la clave ya cargada en el servidor.
+4. Confirma que la ficha diga `cv-corpus-26.0-2026-06-12`, CC0-1.0 y 48,30 GB.
+5. Avisa y el resto lo hago yo por API (ver más abajo): la descarga no la tienes que
+   lanzar tú.
+
+### La API de MDC, ya verificada desde el servidor
+
+| Dato | Valor |
+|---|---|
+| Base URL | `https://mozilladatacollective.com/api` |
+| Autenticación | cabecera `Authorization: Bearer <clave>` (clave en Profile → API) |
+| `GET /health` | 200 sin autenticación — comprobado |
+| `GET /datasets/:id` | metadatos del dataset — comprobado (403 hasta aceptar términos) |
+| `POST /datasets/:id/download` | devuelve una **URL prefirmada** de storage, con `sizeBytes`, `filename` y `checksum`; válida 12 h |
+| Endpoint antiguo | `GET /datasets/:id/download/:token` **retirado** (devuelve 410): si ves un tutorial que lo usa, está obsoleto |
+
+La clave está guardada en `~/.hermes/.env` como `MDC_API_KEY`, con permisos 600 y fuera del
+repositorio. **Rótala cuando termine la descarga**: la enviaste por chat, así que está
+expuesta en el historial y conviene reemplazarla por una nueva en Profile → API.
+
+### Plan de descarga (decidido por el tamaño real, no estimado)
+
+1. Con los términos aceptados, `POST /download` da la URL prefirmada y el `sizeBytes` exacto.
+2. Disco disponible: 72 GB. El archivo es un `.tar.gz` y el audio MP3 apenas comprime, así
+   que el plan es: **descargar el archivo una sola vez (≈45-48 GB), extraer solo lo
+   necesario y borrar el archivo después**. Nunca extraer todo más el archivo a la vez, que
+   serían ~96 GB y no caben.
+3. Extracción selectiva: primero los `.tsv` (pequeños), parsear `validated.tsv` para
+   quedarnos con el subconjunto validado (~595 h), y extraer esos clips en lugar de los
+   1,68 millones.
+4. Registro de procedencia actualizado con los hashes reales de lo descargado.
+5. El audio **no sale del servidor**: a Kaggle solo irían características derivadas, en
+   dataset privado.
+
 
 > Nota de disco: el corpus completo pesa casi 48 GB. Si el espacio aprieta, basta con las
 > 595 h validadas (~12-13 GB de MP3) para todo el proyecto; el resto son clips sin validar

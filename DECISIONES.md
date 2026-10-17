@@ -34,6 +34,7 @@ quedó abierto está nombrado como pendiente al final.
 | 26 | Aprobación del plan | **Aprobado por Diego el 2026-10-17** («dale»). Es la fase 1 del plan y desbloquea la ejecución | Mensaje explícito de aprobación tras la Ronda 4 | Cerrada |
 | 27 | Definición de "activación" y del criterio | Una activación es un frame ≥ umbral que no cae dentro del debounce (cooldown por defecto 1,0 s). El criterio es **código ejecutable**: `--criterio` devuelve 1 si no se cumple, y el banco aborta con código 2 si el hash del manifiesto del test dejó de coincidir | `benchmark/evaluar.py`, `benchmark/README.md`; verificado con `make test` (12/12) y `make autotest` (perfil bueno cumple, perfil malo falla) | Cerrada |
 | 28 | Dónde se extraen las características | En el **propio servidor**, no en Kaggle: medido **28,7× tiempo real** (120 s de audio en 4,18 s) → 595 h ≈ 20,7 h de CPU en serie y ~5 h con 4 procesos. A Kaggle solo viaja el dataset **privado** de características derivadas, y Kaggle queda para el entrenamiento con GPU del candidato A | Medición del 2026-10-17 en este host: uv + Python 3.11 + `openwakeword==0.6.0` + onnxruntime 1.31.0 (CPU); features de forma (1491, 96) para 120 s | Cerrada |
+| 29 | Evaluación estratificada por acento | **Aceptada por Diego el 2026-10-17.** El acento andino-pacífico (Perú, Colombia, Ecuador, oeste de Bolivia y Venezuela andina) entra como **condición propia** del benchmark, no disuelto en el promedio: 38.728 clips de 947 hablantes en Common Voice es 26.0 | Desglose de acentos de la ficha del dataset + el criterio ya exige el mínimo por grupo, no el agregado | Cerrada |
 
 ## Pendientes (nombrados como pendientes, no decididos)
 
@@ -47,7 +48,3 @@ quedó abierto está nombrado como pendiente al final.
 5. **Volumen final del corpus de negativos** (595 h vs un subconjunto). Se decidirá con el
    tiempo real de extracción medido en la fase 4 y la cuota privada de Kaggle.
 6. **Fase 11**: si se persigue ESP32-S3 y/o los candidatos A y B, y con qué presupuesto.
-7. **Evaluación estratificada por acento** (con el subconjunto etiquetado andino-pacífico,
-   38.728 clips de 947 hablantes, como condición propia y no mezclado en el agregado).
-   Propuesto a partir del desglose de acentos de la ficha de Common Voice; pendiente de
-   que Diego lo confirme.
