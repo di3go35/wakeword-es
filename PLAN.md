@@ -73,9 +73,11 @@ puntajes y el hash del commit donde se congeló.
 
 1. Alta en Mozilla Data Collective y descarga del corpus español (CC0). **No se
    reempaqueta ni se publica el audio de Common Voice.**
-2. Precomputar embeddings por lotes **reanudables**; medir el tiempo real con 1 h de audio
-   antes de extrapolar (~4,8 GB estimados para 595 h a 16 bits, contra la cuota privada de
-   Kaggle). Guardar como dataset **privado** de Kaggle.
+2. Precomputar embeddings por lotes **reanudables en el propio servidor**: medido a
+   **28,7× tiempo real** (openwakeword 0.6.0 + onnxruntime CPU en 4 vCPU) → 595 h ≈
+   **20,7 h de CPU en serie, ~5 h con 4 procesos**. Vector verificado: **96 dimensiones**,
+   ~12,4 ventanas/s. Tamaño estimado ~4,8 GB a 16 bits. A Kaggle solo viajan las
+   **características derivadas** (dataset privado); el audio no sale del servidor.
 3. MUSAN: auditar ítem por ítem y descartar lo que no sea claro.
 4. Grabar 30–60 min de ruido propio (TV, calle, cafetería, ventilador).
 5. Conseguir consentimiento escrito de 10–15 personas para clonar su voz.

@@ -28,11 +28,12 @@ quedó abierto está nombrado como pendiente al final.
 | 21 | Test público vs privado | Dos niveles: público sintético reproducible (disjunción por motor y hablante) + privado real (solo agregados y hashes) | Reproducibilidad: sin audio publicable, un benchmark no es verificable por terceros | Cerrada |
 | 22 | Nombre | Repo `wakeword-es` (descriptivo y buscable); el nombre de marca se decide después | Convención de descubrimiento en GitHub | Cerrada |
 | 23 | Fecha límite | Blanda, con checkpoint publicable obligatorio en la semana 14 (≈2027-01-23) | Restricción dominante: 120–200 h totales de una sola persona | Cerrada |
-| 24 | Cómputo | Kaggle para todo el pipeline pesado; el VPS solo orquesta | VPS: 4 vCPU, 7,8 GB RAM, 73 GB libres, **sin GPU**, Python 3.14 (el pipeline estándar exige 3.10–3.12) | Cerrada |
+| 24 | Cómputo | Kaggle para el entrenamiento pesado; el VPS orquesta. **Revisada por la fila 28**: la extracción de características sí corre en el VPS | VPS: 4 vCPU, 7,8 GB RAM, 73 GB libres, **sin GPU**, Python 3.14 (el pipeline estándar exige 3.10–3.12) | Cerrada |
 | 25 | Captura en Android | `AudioSource.VOICE_RECOGNITION` o `UNPROCESSED` (AGC y supresión desactivados por especificación), más test de paridad numérica Python ↔ Android | Compatibilidad Android 4.1 §5.3: con VOICE_RECOGNITION, reducción de ruido y AGC "MUST be disabled"; requisitos de respuesta plana ±3 dB de 100 Hz a 4 kHz | Cerrada |
 
 | 26 | Aprobación del plan | **Aprobado por Diego el 2026-10-17** («dale»). Es la fase 1 del plan y desbloquea la ejecución | Mensaje explícito de aprobación tras la Ronda 4 | Cerrada |
 | 27 | Definición de "activación" y del criterio | Una activación es un frame ≥ umbral que no cae dentro del debounce (cooldown por defecto 1,0 s). El criterio es **código ejecutable**: `--criterio` devuelve 1 si no se cumple, y el banco aborta con código 2 si el hash del manifiesto del test dejó de coincidir | `benchmark/evaluar.py`, `benchmark/README.md`; verificado con `make test` (12/12) y `make autotest` (perfil bueno cumple, perfil malo falla) | Cerrada |
+| 28 | Dónde se extraen las características | En el **propio servidor**, no en Kaggle: medido **28,7× tiempo real** (120 s de audio en 4,18 s) → 595 h ≈ 20,7 h de CPU en serie y ~5 h con 4 procesos. A Kaggle solo viaja el dataset **privado** de características derivadas, y Kaggle queda para el entrenamiento con GPU del candidato A | Medición del 2026-10-17 en este host: uv + Python 3.11 + `openwakeword==0.6.0` + onnxruntime 1.31.0 (CPU); features de forma (1491, 96) para 120 s | Cerrada |
 
 ## Pendientes (nombrados como pendientes, no decididos)
 

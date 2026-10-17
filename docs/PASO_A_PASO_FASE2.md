@@ -1,8 +1,10 @@
 # Fase 2 — qué hacer tú, paso a paso
 
 Lo que ya está hecho desde aquí: banco de evaluación ejecutable, criterio congelado,
-manifiesto con hash, repo público y licencias. **Lo que falta es la línea base**, y eso
-requiere una cuenta de Kaggle tuya, así que es tu turno.
+manifiesto con hash, repo público, licencias y **el entorno del pipeline funcionando y
+medido en tu servidor**. Lo que falta para la línea base es el **audio**: el corpus español
+está detrás de una cuenta en Mozilla Data Collective (paso 1), y la frase provisional la
+elegimos en el paso 3.
 
 El objetivo de esta fase no es un modelo bueno: es un **número malo, reproducido y
 publicado**. Si el baseline sale bien, es señal de que el test está mal construido.
@@ -64,7 +66,34 @@ algo que ningún proyecto abierto hace, y publicar la curva DET desglosada por a
 diferenciador medible y gratis.
 
 
-## Paso 2 — Puntajes del baseline en Kaggle
+## Paso 2 — Entorno local ya preparado (no tienes que hacer nada aquí)
+
+El pipeline ya corre en tu servidor, sin root:
+
+```bash
+~/.hermes/tools/venv-wakeword/.venv311/bin/python   # Python 3.11 + openwakeword 0.6.0 + onnxruntime
+```
+
+Datos medidos el 2026-10-17 en este host:
+
+| Medición | Valor |
+|---|---|
+| Extracción de características (mel + embedding) | **28,7× tiempo real** (120 s de audio en 4,18 s) |
+| Vector de embedding | 96 dimensiones, ~12,4 ventanas/s |
+| 595 h de audio | ≈ **20,7 h de CPU en serie**, ~5 h con 4 procesos |
+| 100 h de audio | ≈ 3,5 h de CPU |
+| Descarga de los modelos base | 1,7 s |
+
+Y una trampa de dependencias que ya está resuelta: **`openwakeword==0.6.0` exige
+`tflite-runtime`, cuyos wheels solo existen hasta Python 3.11**. Por eso el entorno es 3.11
+—que además es el que usa Kaggle— y no 3.12 ni 3.14. Si algún día ves ese error, la causa es
+esta, no tu código.
+
+Consecuencia práctica: **la línea base y el candidato C se pueden entrenar y evaluar aquí**,
+sin gastar cuota de Kaggle. Kaggle queda para el candidato A (CNN con GPU) y para alojar el
+dataset privado de características derivadas.
+
+## Paso 3 — Puntajes del baseline
 
 Restricciones verificadas que te van a morder si las ignoras:
 
@@ -93,7 +122,7 @@ make test        # 12/12, ya en verde
 make benchmark   # evalúa tu puntajes.jsonl contra el criterio congelado
 ```
 
-## Paso 3 — Consentimientos (en paralelo, no urge hasta la fase 4)
+## Paso 4 — Consentimientos (en paralelo, no urge hasta la fase 4)
 
 Plantilla lista en `docs/consentimiento-voz.md`. Necesitas 10–15 personas. Sin
 consentimiento escrito no se clona ninguna voz para generar datos.
