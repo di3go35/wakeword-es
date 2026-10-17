@@ -17,13 +17,13 @@ Datos verificados de la ficha del dataset (consultada el 2026-10-17):
 
 | Campo | Valor |
 |---|---|
-| Nombre | Common Voice Scripted Speech 26.0 — Spanish |
-| Dataset ID | `cmqim2spa00synr071fcp7av0` |
+| Nombre | Common Voice Scripted Speech **27.0** — Spanish |
+| Dataset ID | `cmu5kitx700pemi073feoiqqu` (acceso concedido por Diego el 2026-10-17) |
 | Licencia | **CC0-1.0** |
 | Formato | MP3 |
-| Tamaño | **48,30 GB** |
-| Contenido | 1.680.810 clips · 2.278,66 h grabadas · **595,45 h validadas** · 26.940 hablantes |
-| Fecha de publicación | 2026-06-17 |
+| Tamaño | **51,94 GB** según la API = **48,38 GiB** según la web (mismo número, distinta unidad) |
+| Contenido | 1.683.737 clips · 2.282,72 h grabadas · **597,6 h validadas** · 26.960 hablantes |
+| Fecha de publicación | 2026-09-17 |
 | **Forbidden usage** | "se prohíbe intentar determinar la identidad de los hablantes" y **"se prohíbe re-hospedar o re-compartir este dataset"** |
 
 Pasos:
