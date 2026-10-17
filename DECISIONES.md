@@ -46,3 +46,7 @@ quedó abierto está nombrado como pendiente al final.
 5. **Volumen final del corpus de negativos** (595 h vs un subconjunto). Se decidirá con el
    tiempo real de extracción medido en la fase 4 y la cuota privada de Kaggle.
 6. **Fase 11**: si se persigue ESP32-S3 y/o los candidatos A y B, y con qué presupuesto.
+7. **Evaluación estratificada por acento** (con el subconjunto etiquetado andino-pacífico,
+   38.728 clips de 947 hablantes, como condición propia y no mezclado en el agregado).
+   Propuesto a partir del desglose de acentos de la ficha de Common Voice; pendiente de
+   que Diego lo confirme.

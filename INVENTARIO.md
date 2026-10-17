@@ -11,7 +11,7 @@
 | interkelstar/microwakeword-trainer | Reporte de minado de falsos positivos: 91/140 → 1/140 FP, 94% recall | Evidencia del mayor salto medido; justifica el comando `minar-falsos-positivos` | github.com/interkelstar/microwakeword-trainer |
 | Benchmark de Picovoice | Comparativa a 1 FA por 10 h, CPU en Raspberry Pi 5 | Método de reporte de métricas (curva, no punto) | picovoice.ai/docs/benchmark/wake-word/ |
 | MOCKS (Samsung, Interspeech 2023) | Testset multilingüe de KWS de vocabulario abierto | Comparación externa opcional, sin depender del test propio | HF: voiceintelligenceresearch/MOCKS |
-| Common Voice español 26.0 | CC0, 2.278 h (595 h validadas), 26.940 hablantes | Negativos reales en español, limpios y gratuitos | mozilladatacollective.com |
+| Common Voice español 26.0 | CC0, MP3, **48,30 GB**; 1.680.810 clips, 2.278,66 h (595,45 h validadas), 26.940 hablantes; desglose por acento con **andino-pacífico: 38.728 clips / 947 hablantes**. Prohibido re-hospedar o re-compartir; usar solo localmente y derivar características | Negativos reales en español, limpios y gratuitos; permite evaluación estratificada por acento | dataset ID `cmqim2spa00synr071fcp7av0` en mozilladatacollective.com |
 | MUSAN | CC BY 4.0 general, fuentes mixtas | Ruido/música para aumentación, con auditoría ítem por ítem | openslr.org/17 |
 | Chatterbox Multilingual V3 + `es-mx-latam` | MIT, 0,5B, 23+ idiomas, clonación zero-shot, finetune dedicado es-419 | Diversidad de acentos y voces clonadas con consentimiento | HF: ResembleAI/Chatterbox-Multilingual-es-mx-latam |
 | Kokoro-82M | Apache-2.0; español: `ef_dora`, `em_alex`, `em_santa` | Volumen de datos sintéticos | HF: hexgrad/Kokoro-82M |

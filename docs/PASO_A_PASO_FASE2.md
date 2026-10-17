@@ -9,18 +9,60 @@ publicado**. Si el baseline sale bien, es señal de que el test está mal constr
 
 ---
 
-## Paso 1 — Cuenta en Mozilla Data Collective (10 min)
+## Paso 1 — Cuenta y descarga en Mozilla Data Collective (paso a paso)
 
-1. Alta en `mozilladatacollective.com` (gratis).
-2. Busca el dataset *Common Voice Scripted Speech — Spanish* (CC0). La versión 26.0 son
-   2.278 h, de las cuales ~595 h están validadas: **usa las validadas**.
-3. Descarga solo para tu uso. **No lo reempaquetes ni lo subas a ningún lado** —
-   los términos de Common Voice piden no replicar el dataset en otras plataformas.
-   Lo que sí se publica es el **script de descarga** y el manifiesto con hashes.
+Datos verificados de la ficha del dataset (consultada el 2026-10-17):
 
-> El corpus pesa varios GB y no hace falta entero para la fase 2: con 30–60 min de audio
-> negativo y 20 clips de la frase provisional ya puedes correr el baseline y validar el
-> banco completo.
+| Campo | Valor |
+|---|---|
+| Nombre | Common Voice Scripted Speech 26.0 — Spanish |
+| Dataset ID | `cmqim2spa00synr071fcp7av0` |
+| Licencia | **CC0-1.0** |
+| Formato | MP3 |
+| Tamaño | **48,30 GB** |
+| Contenido | 1.680.810 clips · 2.278,66 h grabadas · **595,45 h validadas** · 26.940 hablantes |
+| Fecha de publicación | 2026-06-17 |
+| **Forbidden usage** | "se prohíbe intentar determinar la identidad de los hablantes" y **"se prohíbe re-hospedar o re-compartir este dataset"** |
+
+Pasos:
+
+1. Entra en `mozilladatacollective.com` y crea una cuenta (es gratuita; es una plataforma
+   nueva, incubada por la Mozilla Foundation).
+2. Abre la ficha del dataset por ID: `mozilladatacollective.com/datasets/cmqim2spa00synr071fcp7av0`
+3. Comprueba que la ficha diga `cv-corpus-26.0-2026-06-12`, CC0-1.0 y 48,30 GB. Si te
+   ofrece variantes (por ejemplo solo el split validado), **elige la más pequeña que
+   incluya `validated.tsv`**; si solo hay una opción, son los 48,30 GB completos.
+4. Pulsa **Download** y acepta los términos si te los pide. Descarga al servidor, no a tu
+   laptop: `/home/di3gor35/datos-cv/` (73 GB libres allí y el `.gitignore` ya bloquea todo
+   audio).
+5. Verifica la descarga: que `validated.tsv` exista, que el número de clips tenga sentido
+   y que no haya archivos truncados (`find . -name '*.mp3' -size -1k | head`).
+6. **No lo re-hospedes en ningún sitio**: ni Kaggle, ni Hugging Face, ni un torrent. La
+   prohibición es explícita en la propia ficha. Lo único que puede salir de aquí son
+   **características derivadas** (embeddings), y en dataset privado; el audio no.
+
+> Nota de disco: el corpus completo pesa casi 48 GB. Si el espacio aprieta, basta con las
+> 595 h validadas (~12-13 GB de MP3) para todo el proyecto; el resto son clips sin validar
+> que no aportan negativos fiables.
+
+### Hallazgo que cambia la calidad del proyecto
+
+La ficha trae el desglose por acento, con etiquetas por clip. Lo relevante para ti:
+
+| Acento | Clips | Hablantes |
+|---|---|---|
+| mexicano | 879.480 (52,3%) | 1.380 |
+| surpeninsular | 178.950 (10,6%) | 261 |
+| nortepeninsular | 66.653 (4,0%) | 638 |
+| **andino (Colombia, Perú, Ecuador, oeste de Bolivia y Venezuela andina)** | **38.728 (2,3%)** | **947** |
+| rioplatense | 23.828 (1,4%) | 579 |
+| caribe | 21.835 (1,3%) | 582 |
+
+Es decir: existe un subconjunto etiquetado del **acento andino-pacífico, el tuyo**, con 947
+hablantes distintos. Eso permite entrenar y evaluar **estratificado por acento**, que es
+algo que ningún proyecto abierto hace, y publicar la curva DET desglosada por acento. Es un
+diferenciador medible y gratis.
+
 
 ## Paso 2 — Puntajes del baseline en Kaggle
 
