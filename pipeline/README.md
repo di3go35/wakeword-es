@@ -15,21 +15,30 @@ y salta lo ya hecho.
 ```bash
 VENV=~/.hermes/tools/venv-wakeword/.venv311/bin/python   # Python 3.11 + openwakeword 0.6.0
 
-# 1. Qué va en cada lote (a partir del validated.tsv del corpus)
+# 0. Descargar el corpus (reanudable, verifica sha256 contra el que publica la API)
+MDC_API_KEY=... pipeline/descargar_corpus.sh
+
+# 1. Extraer los .tsv (van al principio del archivo: no hace falta descomprimir 52 GB)
+timeout 150 tar -xzf ~/datos-cv/common-voice-scripted-speech-27-0-spanis.tar.gz \
+    -C ~/datos-cv/corpus --wildcards 'cv-corpus-27.0-2026-09-11/es/*.tsv'
+
+# 2. Unir duraciones reales (clip_durations.tsv viene en milisegundos)
+python3 pipeline/preparar_validado.py \
+    --dir ~/datos-cv/corpus/cv-corpus-27.0-2026-09-11/es \
+    --salida ~/datos-cv/validado_con_duraciones.tsv
+
+# 3. Planificar lotes por horas (filtrando por acento si interesa)
 python3 pipeline/planificar_lotes.py \
-    --tsv ~/datos-cv/validated.tsv --salida ~/datos-cv/lotes --horas-por-lote 100
+    --tsv ~/datos-cv/validado_con_duraciones.tsv --salida ~/datos-cv/lotes \
+    --horas-por-lote 250 --acentos "andino-pacífico"
 
-# 2. Extraer los clips del lote desde el archivo descargado
-tar -xzf ~/datos-cv/common-voice-scripted-speech-27-0-spanis.tar.gz \
-    -C ~/datos-cv --wildcards -T ~/datos-cv/lotes/lote_000.txt
-
-# 3. Características del lote (mel + embedding)
-$VENV pipeline/extraer_caracteristicas.py \
-    --lista ~/datos-cv/lotes/lote_000.txt --audio-dir ~/datos-cv/clips \
-    --salida ~/datos-cv/features --lote-id 000
-
-# 4. Verificar el manifiesto del lote y borrar el audio del lote
+# 4. Extraer + calcular características + borrar clips, por lote y en paralelo
+pipeline/procesar_lote.sh 000 3
 ```
+
+El paso 4 es el que se lanza en segundo plano: extrae los clips del lote en una sola pasada
+sobre el archivo, reparte el cálculo de características entre 3 procesos y borra los clips al
+terminar. Reanudable de punta a punta.
 
 ## Mediciones reales
 
