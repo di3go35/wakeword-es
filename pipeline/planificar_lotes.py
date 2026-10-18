@@ -29,6 +29,52 @@ from pathlib import Path
 
 DURACION_MEDIA_POR_DEFECTO = 5.5  # segundos, solo si el TSV no trae `duration`
 
+# Etiquetas canónicas del corpus. La columna `accents` de Common Voice es texto libre: trae
+# desde "Andino-Pacífico: Colombia, Perú, ..." hasta frases como "acento de catalanohablante
+# nativo", y algunas filas listan varios acentos separados por "|". Por eso se compara por
+# prefijo contra estas etiquetas y todo lo que no encaja cae en un cajón declarado.
+ACENTOS_CANONICOS = (
+    "Andino-Pacífico",
+    "México",
+    "España: Sur peninsular",
+    "España: Norte peninsular",
+    "España: Centro-Sur peninsular",
+    "España: Islas Canarias",
+    "Rioplatense",
+    "Caribe",
+    "América central",
+    "Chileno",
+    "Español de Filipinas",
+)
+
+SIN_DECLARAR = "(sin acento declarado)"
+NO_NORMALIZADO = "(otro no normalizado)"
+
+
+def etiquetas(valor: str | None) -> list[str]:
+    """Separa una celda de acentos en sus etiquetas (van con `|`)."""
+    return [p.strip() for p in (valor or "").split("|") if p.strip()]
+
+
+def etiqueta_canonica(valor: str | None) -> str:
+    """Etiqueta normalizada para agrupar informes."""
+    for etiqueta in etiquetas(valor):
+        for canon in ACENTOS_CANONICOS:
+            if etiqueta.lower().startswith(canon.lower()):
+                return canon
+    return NO_NORMALIZADO if etiquetas(valor) else SIN_DECLARAR
+
+
+def coincide(valor: str | None, prefijos: set[str] | None) -> bool:
+    """¿Alguna etiqueta de la fila empieza por alguno de los prefijos pedidos?"""
+    if not prefijos:
+        return True
+    return any(
+        etiqueta.lower().startswith(prefijo.lower())
+        for etiqueta in etiquetas(valor)
+        for prefijo in prefijos
+    )
+
 
 def leer_tsv(ruta: str | Path) -> tuple[list[dict], list[str]]:
     """Devuelve (filas, columnas). Falla claro si el archivo no tiene la columna `path`."""
@@ -78,19 +124,20 @@ def planificar(
     lotes: list[dict] = []
     actual: dict = {"horas": 0.0, "clips": [], "por_acento": Counter()}
     for fila, segundos in zip(filas, dur):
-        acento = (fila.get("accents") or "").strip()
-        if acentos is not None and acento not in acentos:
+        if not coincide(fila.get("accents"), acentos):
             continue
+        acento = (fila.get("accents") or "").strip()
         if actual["clips"] and actual["horas"] + segundos > limite:
             lotes.append(actual)
             actual = {"horas": 0.0, "clips": [], "por_acento": Counter()}
         actual["clips"].append(
             {"path": fila["path"].strip(), "accents": acento,
              "client_id": (fila.get("client_id") or "").strip(),
+             "grupo_acento": etiqueta_canonica(acento),
              "segundos": round(segundos, 3)}
         )
         actual["horas"] += segundos
-        actual["por_acento"][acento or "-"] += 1
+        actual["por_acento"][etiqueta_canonica(acento)] += 1
     if actual["clips"]:
         lotes.append(actual)
 
@@ -136,7 +183,9 @@ def main(argv=None) -> int:
     p.add_argument("--horas-por-lote", type=float, default=100.0)
     p.add_argument("--duracion-media", type=float, default=DURACION_MEDIA_POR_DEFECTO)
     p.add_argument("--acentos", default=None,
-                   help="lista separada por comas; por defecto, todos")
+                   help="prefijos separados por comas, p. ej. 'andino-pacífico,méxico'; "
+                        "por defecto, todos. La comparación es por prefijo y sin distinguir "
+                        "mayúsculas, porque la columna del corpus es texto libre")
     args = p.parse_args(argv)
 
     filas, columnas = leer_tsv(args.tsv)

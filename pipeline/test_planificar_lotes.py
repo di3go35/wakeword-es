@@ -10,6 +10,7 @@ import os
 import sys
 import tempfile
 import unittest
+from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -54,15 +55,45 @@ class TestPlanificador(unittest.TestCase):
         self.assertEqual([len(l["clips"]) for l in lotes], [2, 2, 2])
         self.assertEqual([l["horas"] for l in lotes], [2.0, 2.0, 2.0])
 
-    def test_filtro_de_acento(self):
-        ruta = escribir_tsv(self.dir / "validated.tsv",
-                            [fila(i, "andino" if i < 3 else "mexicano") for i in range(6)])
+    def test_filtro_de_acento_por_prefijo(self):
+        filas_tsv = [
+            fila(0, "Andino-Pacífico: Colombia, Perú, Ecuador"),
+            fila(1, "Andino-Pacífico: Colombia, Perú, Ecuador|Acento costeño de Lima Perú"),
+            fila(2, "Andino-Pacífico: Colombia, Perú, Ecuador"),
+            fila(3, "México"),
+            fila(4, "acento de catalanohablante nativo"),
+            fila(5, ""),
+        ]
+        ruta = escribir_tsv(self.dir / "validated.tsv", filas_tsv)
         filas, columnas = pl.leer_tsv(ruta)
         dur, _ = pl.duraciones(filas, columnas, pl.DURACION_MEDIA_POR_DEFECTO)
-        lotes = pl.planificar(filas, dur, horas_por_lote=100, acentos={"andino"})
+
+        lotes = pl.planificar(filas, dur, horas_por_lote=100, acentos={"andino-pacífico"})
         self.assertEqual(sum(len(l["clips"]) for l in lotes), 3)
-        self.assertTrue(all(c["accents"] == "andino"
+        self.assertTrue(all(c["grupo_acento"] == "Andino-Pacífico"
                             for l in lotes for c in l["clips"]))
+
+        # sin filtro entran los seis, con los cajones declarados
+        todos = pl.planificar(filas, dur, horas_por_lote=100)
+        grupos = Counter()
+        for l in todos:
+            grupos.update(l["por_acento"])
+        self.assertEqual(grupos["Andino-Pacífico"], 3)
+        self.assertEqual(grupos["México"], 1)
+        self.assertEqual(grupos[pl.NO_NORMALIZADO], 1)
+        self.assertEqual(grupos[pl.SIN_DECLARAR], 1)
+
+    def test_normalizacion_de_acentos(self):
+        self.assertEqual(pl.etiqueta_canonica(""), pl.SIN_DECLARAR)
+        self.assertEqual(pl.etiqueta_canonica("acento de catalanohablante nativo"),
+                         pl.NO_NORMALIZADO)
+        self.assertEqual(pl.etiqueta_canonica("México|Caribe: Cuba, Venezuela"),
+                         "México")
+        self.assertEqual(pl.etiqueta_canonica("Español neutro de Lima-Peru"),
+                         pl.NO_NORMALIZADO)
+        self.assertTrue(pl.coincide("Andino-Pacífico: Colombia", {"andino"}))
+        self.assertFalse(pl.coincide("México", {"andino"}))
+        self.assertTrue(pl.coincide("", None))
 
     def test_sin_columna_duration_usa_estimacion_declarada(self):
         cabecera = [c for c in CABECERA if c != "duration"]
