@@ -28,6 +28,33 @@ PY="$(command -v python3)"
 info() { echo "[$(date '+%H:%M:%S')] lote $LOTE: $*"; }
 mkdir -p "$AUDIO" "$FEATURES" "$LOGS"
 
+# Presupuesto de recursos. El 2026-10-18 el servidor se apagó a mitad de una extracción: la
+# investigación descartó OOM y saturación (22% CPU, 5,6 GB disponibles), pero deja dos
+# lecciones: el job tiene que poder convivir con el resto del sistema y tiene que abortar
+# solo si el sistema se queda sin memoria, en vez de esperar al OOM killer.
+MEM_MINIMA_MB="${MEM_MINIMA_MB:-900}"
+LOAD_MAXIMA="${LOAD_MAXIMA:-3.5}"
+
+vigilar_recursos() {
+  local libre_mb cargas limite
+  libre_mb=$(awk '/MemAvailable/{print int($2/1024)}' /proc/meminfo)
+  cargas=$(awk '{printf "%d", $1*100}' /proc/loadavg)
+  limite=$(awk -v l="$LOAD_MAXIMA" 'BEGIN{printf "%d", l*100}')
+  if [ "$libre_mb" -lt "$MEM_MINIMA_MB" ]; then
+    info "ABORTANDO: memoria disponible ${libre_mb} MB < ${MEM_MINIMA_MB} MB"
+    return 1
+  fi
+  if [ "$cargas" -gt "$limite" ]; then
+    info "aviso: carga alta ($(awk '{print $1}' /proc/loadavg))"
+  fi
+  return 0
+}
+
+# Cortesía con el resto del sistema: el job cede CPU y disco a lo interactivo.
+nice -n 10 true 2>/dev/null && RE_NICE="nice -n 10" || RE_NICE=""
+RE_IO=""
+command -v ionice >/dev/null && RE_IO="ionice -c2 -n7"
+
 [ -f "$LISTA" ] || { echo "ERROR: falta $LISTA" >&2; exit 2; }
 TOTAL=$(wc -l < "$LISTA")
 info "clips en el lote: $TOTAL | procesos: $NP"
@@ -39,12 +66,14 @@ fi
 
 # --- 2. Extracción (una sola pasada sobre el archivo; salta si ya están)
 if [ "$(ls -1 "$AUDIO" 2>/dev/null | wc -l)" -lt "$TOTAL" ]; then
-  info "extrayendo clips (una pasada sobre los 52 GB, 5-10 min)..."
-  tar -xzf "$ARCH" -C "$AUDIO" -T "$LISTA_TAR" --strip-components=3
+  info "extrayendo clips que falten (una pasada sobre los 52 GB)..."
+  $RE_IO $RE_NICE tar -xzf "$ARCH" -C "$AUDIO" -T "$LISTA_TAR" --strip-components=3 \
+      --skip-old-files
   info "extracción terminada: $(ls -1 "$AUDIO" | wc -l) archivos en clips/"
 else
   info "los clips ya estaban extraídos"
 fi
+vigilar_recursos || exit 3
 
 # --- 3. Características en paralelo
 mkdir -p "$BASE/trabajo"
@@ -53,11 +82,25 @@ pids=()
 for parte in "$BASE/trabajo/parte_"*.txt; do
   sufijo="$(basename "$parte" .txt | sed 's/parte_//')"
   log="$LOGS/lote_${LOTE}_${sufijo}.log"
-  "$VENV" "$(dirname "$0")/extraer_caracteristicas.py" \
+  $RE_IO $RE_NICE "$VENV" "$(dirname "$0")/extraer_caracteristicas.py" \
       --lista "$parte" --audio-dir "$AUDIO" --salida "$FEATURES" \
       --lote-id "${LOTE}${sufijo}" > "$log" 2>&1 &
   pids+=($!)
   info "proceso $sufijo lanzado (log: $log)"
+done
+# Mientras trabajan: vigilar memoria cada 30 s y abortar limpio si el sistema se ahoga.
+while :; do
+  vivos=0
+  for pid in "${pids[@]}"; do kill -0 "$pid" 2>/dev/null && vivos=$((vivos + 1)); done
+  [ "$vivos" -eq 0 ] && break
+  if ! vigilar_recursos; then
+    info "matando los procesos por falta de memoria"
+    for pid in "${pids[@]}"; do kill -TERM "$pid" 2>/dev/null; done
+    sleep 5
+    for pid in "${pids[@]}"; do kill -KILL "$pid" 2>/dev/null; done
+    exit 3
+  fi
+  sleep 30
 done
 for pid in "${pids[@]}"; do wait "$pid"; done
 info "los $NP procesos terminaron"
