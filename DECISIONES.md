@@ -42,6 +42,8 @@ quedó abierto está nombrado como pendiente al final.
 
 | 33 | Frase de activación congelada | **`hey celeste`**. Medida sobre 10,9 M de palabras: bigrama 0,000/millón, nombre 16,61/millón, colisiones fonéticas 127,34/millón (6× menos que `emma`, 6,4× menos que `luna`). Con disparador (no el nombre solo: empeora la evidencia acústica) y con `hey` en vez de `oye` (14,13/millón en texto, mucho más en habla, y deja la frase en 4 sílabas). Acta en `FRASE.md`, hash en `benchmark/FRASE_HASH` | El nombre solo de 2 sílabas da la mitad de material acústico y su esqueleto consonántico colisiona con el 8% del idioma (`lía`, `zoe`). Nombre quechua (`wayra`, `sumaq`) puntúa 0,00 pero por grafías ajenas al español: riesgo de que el TTS lo pronuncie mal y contamine los positivos | Cerrada |
 
+| 34 | Positivos: **no** basta un solo motor TTS | La cabeza entrenada solo con Kokoro da recall 1,000 con las tres voces de Kokoro (incluida `em_santa`, no vista en entrenamiento) y **recall 0,000 con Chatterbox** (0 de 10 clips válidos, prob. máxima 0,399). Aprende el motor, no la frase. Los positivos deben cubrir varios motores **y** aumentación a nivel de audio (ruido, EQ, reverberación, tono) porque el embedding está congelado y solo cambia si cambia el audio | El control de «otras frases con la misma voz» da 0,0000 y no detecta este fallo: solo descarta que el modelo detecte cualquier TTS. La disjunción por motor ya estaba decidida; esto demuestra que además hay que **entrenar** con varios motores | Cerrada |
+
 ## Pendientes (nombrados como pendientes, no decididos)
 
 1. **La frase exacta.** Se elegirá por medición en la fase 3; hoy no hay frase decidida.
