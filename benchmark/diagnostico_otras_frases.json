@@ -1,0 +1,26 @@
+{
+  "buenos días": {
+    "clips": 27,
+    "media": 0.0001,
+    "max": 0.0005,
+    "sobre_umbral": 0
+  },
+  "hola mundo": {
+    "clips": 27,
+    "media": 0.0,
+    "max": 0.0,
+    "sobre_umbral": 0
+  },
+  "la casa azul": {
+    "clips": 27,
+    "media": 0.0699,
+    "max": 0.6261,
+    "sobre_umbral": 1
+  },
+  "mañana temprano": {
+    "clips": 27,
+    "media": 0.0,
+    "max": 0.0001,
+    "sobre_umbral": 0
+  }
+}

@@ -35,6 +35,12 @@ import numpy as np
 
 VENTANA = 16
 DIM = 96
+# Una ventana de 16 frames no cubre 1,28 s de audio: cada frame de embedding consume 76 frames
+# de mel (0,76 s) y avanza 8 (0,08 s), así que la ventana k cubre [0,08·k, 2,04 + 0,08·k].
+# Etiquetar de positivo toda ventana de un clip positivo enseña que "celeste" sin "hey" es la
+# wakeword: eso produjo 0,773 FA/h en la línea base. Solo es positivo si la frase cabe entera.
+HOP_S = 0.08
+CONTEXTO_S = 2.04
 VOCES_TRAIN = ("ef_dora", "em_alex")
 VOCES_VAL = ("em_santa",)
 
@@ -56,9 +62,30 @@ def mapa_hablantes(tsv: Path) -> dict[str, str]:
         }
 
 
-def ventanas_positivas(features_pos: Path, manifiesto: Path) -> dict[str, list[np.ndarray]]:
-    """Ventanas de 16 frames por voz, desde el manifiesto de los clips sintéticos."""
+def extensión_frase(wav: Path) -> tuple[float, float] | None:
+    """Principio y fin de la frase en el clip: el relleno es silencio exacto (ceros)."""
+    import soundfile as sf
+
+    audio, sr = sf.read(wav, dtype="float32", always_2d=False)
+    if audio.ndim > 1:
+        audio = audio.mean(axis=1)
+    activo = np.flatnonzero(np.abs(audio) > 1e-4)
+    if activo.size == 0:
+        return None
+    return float(activo[0]) / sr, float(activo[-1] + 1) / sr
+
+
+def ventanas_positivas(
+    features_pos: Path, manifiesto: Path, audio_pos: Path
+) -> tuple[dict[str, list[np.ndarray]], dict[str, list[np.ndarray]]]:
+    """Ventanas de 16 frames: (positivas, negativas-parciales) por voz.
+
+    Positiva = la ventana contiene la frase COMPLETA. Negativa parcial = la ventana corta la frase
+    (típicamente solo "celeste"): es el ejemplo que enseña a no activarse con media frase.
+    """
     por_voz: dict[str, list[np.ndarray]] = {}
+    parciales: dict[str, list[np.ndarray]] = {}
+    sin_span = 0
     with manifiesto.open(encoding="utf-8") as f:
         for linea in f:
             if not linea.strip():
@@ -70,12 +97,22 @@ def ventanas_positivas(features_pos: Path, manifiesto: Path) -> dict[str, list[n
             datos = np.load(npy, mmap_mode="r")
             if datos.shape[0] < VENTANA or datos.shape[1] != DIM:
                 continue
-            voz = fila["archivo"].split("_")[0] + "_" + fila["archivo"].split("_")[1]
-            for inicio in range(datos.shape[0] - VENTANA + 1):
-                por_voz.setdefault(voz, []).append(
-                    np.array(datos[inicio:inicio + VENTANA], dtype=np.float16)
-                )
-    return por_voz
+            span = extensión_frase(audio_pos / (Path(fila["archivo"]).stem + ".wav"))
+            if span is None:
+                sin_span += 1
+                continue
+            t0, t1 = span
+            voz = "_".join(Path(fila["archivo"]).stem.split("_")[:2])
+            for k in range(datos.shape[0] - VENTANA + 1):
+                ventana = np.array(datos[k:k + VENTANA], dtype=np.float16)
+                contiene = (HOP_S * k <= t0) and (CONTEXTO_S + HOP_S * k >= t1)
+                if contiene:
+                    por_voz.setdefault(voz, []).append(ventana)
+                else:
+                    parciales.setdefault(voz, []).append(ventana)
+    if sin_span:
+        print(f"  aviso: {sin_span} clips sin señal detectable (¿silencio?)")
+    return por_voz, parciales
 
 
 def ventanas_negativas(
@@ -123,6 +160,8 @@ def main(argv=None) -> int:
     p.add_argument("--features", required=True)
     p.add_argument("--features-positivos", required=True)
     p.add_argument("--salida", required=True)
+    p.add_argument("--audio-positivos", required=True,
+                   help="carpeta de WAV sintéticos (para localizar la frase dentro del relleno)")
     p.add_argument("--neg-train", type=int, default=150_000)
     p.add_argument("--neg-val", type=int, default=25_000)
     p.add_argument("--validacion-pct", type=float, default=10.0)
@@ -149,9 +188,11 @@ def main(argv=None) -> int:
     manifiesto_pos = features_pos / "manifiesto_kokoro.jsonl"
 
     print("ventanas positivas...")
-    por_voz = ventanas_positivas(features_pos, manifiesto_pos)
+    por_voz, parciales = ventanas_positivas(features_pos, manifiesto_pos, Path(args.audio_positivos))
     pos_train = [v for voz in VOCES_TRAIN for v in por_voz.get(voz, [])]
     pos_val = [v for voz in VOCES_VAL for v in por_voz.get(voz, [])]
+    # las parciales de las voces de train entran como negativos: media frase no es la wakeword
+    par_train = [v for voz in VOCES_TRAIN for v in parciales.get(voz, [])]
     print(f"  train: {len(pos_train)} ventanas de {', '.join(VOCES_TRAIN)}")
     for voz in VOCES_TRAIN + VOCES_VAL:
         print(f"    {voz}: {len(por_voz.get(voz, []))} ventanas")
@@ -184,7 +225,9 @@ def main(argv=None) -> int:
     arrays = {
         "pos_train": np.stack(pos_train),
         "pos_val": np.stack(pos_val),
-        "neg_train": neg_train,
+        "neg_train": np.concatenate([neg_train, np.stack(par_train)]) if par_train else neg_train,
+        "neg_parciales": np.stack(par_train) if par_train else np.zeros((0, VENTANA, DIM),
+                                                                      dtype=np.float16),
         "neg_val": neg_val,
     }
     resumen = {
@@ -200,6 +243,8 @@ def main(argv=None) -> int:
         "arrays": {},
     }
     for nombre, arr in arrays.items():
+        if arr.shape[0] == 0:
+            continue
         ruta = salida / f"{nombre}.npy"
         np.save(ruta, arr)
         resumen["arrays"][nombre] = {

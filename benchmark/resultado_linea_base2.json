@@ -1,0 +1,89 @@
+{
+  "modelo": "/home/di3gor35/datos-cv/entrenamiento/cabeza.onnx",
+  "umbral": 0.5,
+  "frames_consecutivos": 3,
+  "enfriamiento_s": 1.0,
+  "total_eventos": 1,
+  "total_horas": 53.031,
+  "fa_por_hora": 0.0189,
+  "por_condicion": {
+    "Rioplatense": {
+      "clips": 3926,
+      "horas": 5.808,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "(sin acento declarado)": {
+      "clips": 3399,
+      "horas": 5.001,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "España: Sur peninsular": {
+      "clips": 3762,
+      "horas": 5.406,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "España: Islas Canarias": {
+      "clips": 981,
+      "horas": 1.292,
+      "eventos": 1,
+      "fa_por_hora": 0.7741
+    },
+    "Andino-Pacífico": {
+      "clips": 3299,
+      "horas": 5.001,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "España: Centro-Sur peninsular": {
+      "clips": 3680,
+      "horas": 5.026,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "América central": {
+      "clips": 3282,
+      "horas": 5.016,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "España: Norte peninsular": {
+      "clips": 3358,
+      "horas": 4.817,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "Chileno": {
+      "clips": 3152,
+      "horas": 3.911,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "Caribe": {
+      "clips": 3152,
+      "horas": 5.015,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "México": {
+      "clips": 4492,
+      "horas": 5.913,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "Español de Filipinas": {
+      "clips": 329,
+      "horas": 0.38,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    },
+    "(otro no normalizado)": {
+      "clips": 294,
+      "horas": 0.444,
+      "eventos": 0,
+      "fa_por_hora": 0.0
+    }
+  }
+}

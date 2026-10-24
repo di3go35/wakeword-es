@@ -9,6 +9,7 @@
 # Cualquier paso que falle detiene la cadena: no se entrena sobre datos incompletos.
 
 set -u
+set -o pipefail
 REPO="$HOME/wakeword-es"
 P="$HOME/.hermes/tools/venv-wakeword/.venv311/bin/python"
 POS="$HOME/datos-cv/positivos/kokoro_pad"
