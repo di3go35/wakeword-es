@@ -1,0 +1,91 @@
+{
+  "semilla": 20261018,
+  "test_pct": 15.0,
+  "regla": "disjunto por client_id, estratificado por acento canónico, tope del 40% de hablantes por acento en test",
+  "horas_minimas_por_condicion": 5.0,
+  "hablantes_test": 3247,
+  "hablantes_train": 14441,
+  "horas_test": 130.46,
+  "horas_train": 489.51,
+  "por_acento": {
+    "(sin acento declarado)": {
+      "hablantes_train": 11297,
+      "horas_train": 178.51,
+      "hablantes_test": 1994,
+      "horas_test": 27.14
+    },
+    "México": {
+      "hablantes_train": 937,
+      "horas_train": 139.66,
+      "hablantes_test": 165,
+      "horas_test": 54.83
+    },
+    "España: Sur peninsular": {
+      "hablantes_train": 113,
+      "horas_train": 52.6,
+      "hablantes_test": 74,
+      "horas_test": 5.52
+    },
+    "España: Norte peninsular": {
+      "hablantes_train": 400,
+      "horas_train": 50.46,
+      "hablantes_test": 71,
+      "horas_test": 7.44
+    },
+    "Andino-Pacífico": {
+      "hablantes_train": 508,
+      "horas_train": 19.76,
+      "hablantes_test": 191,
+      "horas_test": 6.68
+    },
+    "Rioplatense": {
+      "hablantes_train": 264,
+      "horas_train": 14.53,
+      "hablantes_test": 154,
+      "horas_test": 6.02
+    },
+    "España: Centro-Sur peninsular": {
+      "hablantes_train": 222,
+      "horas_train": 10.02,
+      "hablantes_test": 133,
+      "horas_test": 6.04
+    },
+    "Caribe": {
+      "hablantes_train": 254,
+      "horas_train": 10.74,
+      "hablantes_test": 169,
+      "horas_test": 5.27
+    },
+    "América central": {
+      "hablantes_train": 174,
+      "horas_train": 5.39,
+      "hablantes_test": 116,
+      "horas_test": 5.5
+    },
+    "Chileno": {
+      "hablantes_train": 131,
+      "horas_train": 4.82,
+      "hablantes_test": 87,
+      "horas_test": 3.91
+    },
+    "España: Islas Canarias": {
+      "hablantes_train": 102,
+      "horas_train": 2.64,
+      "hablantes_test": 68,
+      "horas_test": 1.29
+    },
+    "(otro no normalizado)": {
+      "hablantes_train": 37,
+      "horas_train": 0.34,
+      "hablantes_test": 24,
+      "horas_test": 0.44
+    },
+    "Español de Filipinas": {
+      "hablantes_train": 2,
+      "horas_train": 0.04,
+      "hablantes_test": 1,
+      "horas_test": 0.38
+    }
+  },
+  "nota": "Las listas completas de hablantes (test/train) no se publican: viven en ~/datos-cv/split.json y su sha256 es el compromiso verificable."
+}
