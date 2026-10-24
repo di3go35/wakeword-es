@@ -27,6 +27,13 @@ from pathlib import Path
 
 SR = 16000
 
+# Un clip más corto que esto no produce una ventana de embedding válida: el modelo mel
+# espera un tensor 4-D y con audios de pocas decenas de milisegundos la entrada sale con
+# rango 2 y ONNX aborta ("Invalid rank for input"). Esos clips se descartan con motivo
+# declarado en vez de contarse como error del pipeline. Medido en el lote 001: 5 de 179.924.
+MIN_SEGUNDOS = 0.30
+DIM_EMBEDDING = 96
+
 
 def buscar_ffmpeg(preferido: str = "ffmpeg") -> str:
     """ffmpeg del sistema o el que vive en el toolchain local."""
@@ -80,9 +87,10 @@ def procesar_lote(
     if max_clips is not None:
         pendientes = pendientes[:max_clips]
 
-    hechos_ahora = saltados = errores = 0
+    hechos_ahora = saltados = errores = descartados = 0
     segundos_totales = 0.0
     t0 = time.time()
+    descartes = salida / f"descartes_{lote_id}.jsonl"
     for nombre in pendientes:
         if nombre in hechos:
             saltados += 1
@@ -93,7 +101,21 @@ def procesar_lote(
             pcm = decodificar(ffmpeg, origen)
             audio = np.frombuffer(pcm, dtype=np.int16)
             segundos = len(audio) / SR
+            if segundos < MIN_SEGUNDOS:
+                with descartes.open("a", encoding="utf-8") as f:
+                    f.write(json.dumps({"clip": nombre,
+                                        "motivo": f"audio demasiado corto ({segundos:.3f} s)"},
+                                       ensure_ascii=False) + "\n")
+                descartados += 1
+                continue
             feats = np.asarray(extraer(audio), dtype=np.float32)
+            if feats.ndim != 2 or feats.shape[1] != DIM_EMBEDDING or feats.shape[0] == 0:
+                with descartes.open("a", encoding="utf-8") as f:
+                    f.write(json.dumps({"clip": nombre,
+                                        "motivo": f"forma inesperada {list(feats.shape)}"},
+                                       ensure_ascii=False) + "\n")
+                descartados += 1
+                continue
             np.save(destino, feats)
             with manifiesto.open("a", encoding="utf-8") as f:
                 f.write(json.dumps({
@@ -119,6 +141,7 @@ def procesar_lote(
         "clips_en_lista": len(pendientes),
         "procesados": hechos_ahora,
         "saltados_ya_existentes": saltados,
+        "descartados": descartados,
         "errores": errores,
         "horas_audio": round(segundos_totales / 3600.0, 4),
         "segundos_cpu": round(dt, 2),

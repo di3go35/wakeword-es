@@ -26,7 +26,7 @@
 | Frase congelada con su justificación medida | 3 | `FRASE.md` + hash de commit |
 | Registro de procedencia de cada fuente con licencia y hash | 4 | `PROCEDENCIA.md` |
 | Consentimientos escritos de 10–15 personas | 4 | Referencias por hash (los PDF no se publican) |
-| Tamaño y tiempo reales de extracción de embeddings | 4 | Medición con 1 h extrapolada |
+| Características de los 3 lotes (620 h) | 4 | **Verificado**: lote 000 (170.930 clips, 250,00 h) y lote 001 (179.918 útiles de 179.924, 250,00 h, 6 descartes con motivo documentado) pasan `verificar_features.py` sin faltantes sin explicación. Lote 002 (119,95 h) en ejecución. Factor medido: 21,9× por proceso, 12 h 41 min de CPU en el lote 001 |
 | Test congelado con hashes publicados antes de entrenar | 5 | Hash en el repo antes del primer entrenamiento |
 | Curva DET del modelo final vs línea base | 6 | Tabla comparativa en el repo |
 | 30 min de silencio digital = 0 activaciones | 6 | Log del test |

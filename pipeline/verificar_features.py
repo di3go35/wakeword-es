@@ -52,6 +52,16 @@ def verificar(lote: str, lista: Path, features: Path, dim: int = 96) -> dict:
         if len(f) != 2 or f[-1] != dim
     }
 
+    # Descartes documentados: cada clip excluido debe tener su motivo escrito. Un clip que
+    # falta sin motivo sigue siendo un fallo; uno con motivo es una exclusión consciente.
+    descartados: dict[str, str] = {}
+    for fichero in sorted(features.glob(f"descartes_{lote}*.jsonl")):
+        for linea in fichero.read_text(encoding="utf-8").splitlines():
+            if linea.strip():
+                d = json.loads(linea)
+                descartados[Path(d["clip"]).stem] = d.get("motivo", "(sin motivo)")
+    faltan_sin_motivo = faltan - set(descartados)
+
     return {
         "lote": lote,
         "clips_en_lista": len(clips),
@@ -61,10 +71,13 @@ def verificar(lote: str, lista: Path, features: Path, dim: int = 96) -> dict:
         "horas": round(horas, 2),
         "formas_distintas": {str(k): v for k, v in sorted(formas.items(), key=lambda kv: -kv[1])[:5]},
         "faltan_en_manifiesto": len(faltan),
+        "faltan_sin_motivo": len(faltan_sin_motivo),
+        "descartados": len(descartados),
+        "motivos_de_descarte": sorted(set(descartados.values())),
         "sobran_en_manifiesto": len(sobran),
         "sin_archivo_npy": len(sin_npy),
         "dims_fuera_de_lo_esperado": len(dims_malas),
-        "completo": not faltan and not sobran and not sin_npy and not dims_malas,
+        "completo": not faltan_sin_motivo and not sobran and not sin_npy and not dims_malas,
     }
 
 
