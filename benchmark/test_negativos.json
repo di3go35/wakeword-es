@@ -1,0 +1,69 @@
+{
+  "regla": "hablantes de test únicamente; condiciones con >=5 h toman hablantes completos hasta el objetivo; los acentos menores se agregan como 'otros'",
+  "horas_por_condicion": 5.0,
+  "clips": 37106,
+  "horas_totales": 53.04,
+  "por_condicion": {
+    "México": {
+      "horas": 5.91,
+      "hablantes": 46,
+      "clips": 4492,
+      "disponible_h": 54.83
+    },
+    "(sin acento declarado)": {
+      "horas": 5.0,
+      "hablantes": 406,
+      "clips": 3399,
+      "disponible_h": 27.14
+    },
+    "España: Norte peninsular": {
+      "horas": 4.82,
+      "hablantes": 71,
+      "clips": 3358,
+      "disponible_h": 7.44
+    },
+    "Andino-Pacífico": {
+      "horas": 5.0,
+      "hablantes": 138,
+      "clips": 3299,
+      "disponible_h": 6.68
+    },
+    "España: Centro-Sur peninsular": {
+      "horas": 5.03,
+      "hablantes": 104,
+      "clips": 3680,
+      "disponible_h": 6.04
+    },
+    "Rioplatense": {
+      "horas": 5.81,
+      "hablantes": 146,
+      "clips": 3926,
+      "disponible_h": 6.02
+    },
+    "España: Sur peninsular": {
+      "horas": 5.41,
+      "hablantes": 71,
+      "clips": 3762,
+      "disponible_h": 5.52
+    },
+    "América central": {
+      "horas": 5.02,
+      "hablantes": 93,
+      "clips": 3282,
+      "disponible_h": 5.5
+    },
+    "Caribe": {
+      "horas": 5.02,
+      "hablantes": 158,
+      "clips": 3152,
+      "disponible_h": 5.27
+    },
+    "otros": {
+      "horas": 6.02,
+      "hablantes": 180,
+      "clips": 4756,
+      "disponible_h": 6.02
+    }
+  },
+  "sha256_seleccion": "720a7d3b765fc109170e93cf764c693c1bd67dffb5194e2caacd033bc2efc959"
+}
