@@ -70,6 +70,10 @@ def main(argv=None) -> int:
     p.add_argument("--por-voz", type=int, default=600)
     p.add_argument("--semilla", type=int, default=20261024)
     p.add_argument("--frase", default=FRASE)
+    p.add_argument("--pad-min", type=float, default=2.2,
+                   help="duración mínima del clip con relleno (s)")
+    p.add_argument("--pad-max", type=float, default=3.2,
+                   help="duración máxima del clip con relleno (s)")
     args = p.parse_args(argv)
 
     from kokoro import KPipeline
@@ -106,10 +110,17 @@ def main(argv=None) -> int:
                 audio = np.concatenate([t.numpy() for t in trozos]).astype(np.float32)
                 audio = a_16k(perturbar_tono(audio, factor_tono))
                 audio = normalizar_pico(audio, ganancia)
-                # Silencio corto: el modelo tiene que aprender a activar también con margen.
+                # Relleno: el modelo de embedding necesita 76 frames de mel de contexto y solo
+                # emite ~5,3 vectores por segundo en clips cortos, así que una frase de 1,3 s da
+                # 7 frames y no llena la ventana de 16 (1,28 s). Se rellena hasta 2,2-3,2 s con
+                # el inicio desplazado al azar, para que la frase no caiga siempre en el centro.
+                objetivo = rng.uniform(args.pad_min, args.pad_max)
+                faltante = max(0.0, objetivo - len(audio) / FRECUENCIA_SALIDA)
+                adelante = rng.uniform(0.15, 0.55) * faltante
+                atras = faltante - adelante
                 audio = np.concatenate([
-                    np.zeros(int(0.05 * FRECUENCIA_SALIDA), dtype=np.float32), audio,
-                    np.zeros(int(0.10 * FRECUENCIA_SALIDA), dtype=np.float32),
+                    np.zeros(int(adelante * FRECUENCIA_SALIDA), dtype=np.float32), audio,
+                    np.zeros(int(atras * FRECUENCIA_SALIDA), dtype=np.float32),
                 ])
 
                 sf.write(destino, audio, FRECUENCIA_SALIDA, subtype="PCM_16")
