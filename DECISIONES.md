@@ -40,6 +40,8 @@ quedó abierto está nombrado como pendiente al final.
 
 | 32 | Partición de hablantes para el test | **Disjunta por `client_id`** y estratificada por acento canónico, semilla 20261018, con **tope del 40% de hablantes por acento** en test y un mínimo de ~6 h por acento cuando el acento las tiene. 14.184 hablantes a train (482,55 h) / 3.504 a test (137,41 h). Solo se reportan como condición propia los acentos con **≥5 h de test**; los menores se agregan como «otros» | Un acento con 1-3 h de test no soporta una afirmación de ≤0,5 FA/h: un solo falso positivo movería la métrica 0,3-0,6/h. El tope del 40% evita quedarse sin negativos de entrenamiento en acentos pequeños | Cerrada |
 
+| 33 | Frase de activación congelada | **`hey celeste`**. Medida sobre 10,9 M de palabras: bigrama 0,000/millón, nombre 16,61/millón, colisiones fonéticas 127,34/millón (6× menos que `emma`, 6,4× menos que `luna`). Con disparador (no el nombre solo: empeora la evidencia acústica) y con `hey` en vez de `oye` (14,13/millón en texto, mucho más en habla, y deja la frase en 4 sílabas). Acta en `FRASE.md`, hash en `benchmark/FRASE_HASH` | El nombre solo de 2 sílabas da la mitad de material acústico y su esqueleto consonántico colisiona con el 8% del idioma (`lía`, `zoe`). Nombre quechua (`wayra`, `sumaq`) puntúa 0,00 pero por grafías ajenas al español: riesgo de que el TTS lo pronuncie mal y contamine los positivos | Cerrada |
+
 ## Pendientes (nombrados como pendientes, no decididos)
 
 1. **La frase exacta.** Se elegirá por medición en la fase 3; hoy no hay frase decidida.

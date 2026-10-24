@@ -83,16 +83,25 @@ def evaluar(
     candidata: str, unigramas: Counter, bigramas: Counter, total: int, esqueletos: Counter
 ) -> dict:
     palabras = normalizar(candidata).split()
-    if len(palabras) != 2:
-        raise ValueError(f"la candidata debe tener dos palabras: {candidata!r}")
-    disparador, nombre = palabras
-    bigrama = bigramas.get((disparador, nombre), 0)
+    if len(palabras) == 2:
+        disparador, nombre = palabras
+        bigrama = bigramas.get((disparador, nombre), 0)
+    elif len(palabras) == 1:
+        disparador, nombre = "", palabras[0]
+        bigrama = unigramas.get(nombre, 0)   # sin disparador, lo que cuenta es la palabra
+    else:
+        raise ValueError(f"candidata con {len(palabras)} palabras: {candidata!r}")
     freq_nombre = unigramas.get(nombre, 0)
     colisiones = esqueletos.get(esqueleto(nombre), 0)
     n_silabas = silabas(candidata)
 
     por_millon = lambda n: round(n * PALABRAS_POR_MILLON / total, 3)  # noqa: E731
-    penal_silabas = 0.0 if 3 <= n_silabas <= 4 else (1.5 if n_silabas in (2, 5) else 3.0)
+    if disparador:
+        penal_silabas = 0.0 if 3 <= n_silabas <= 4 else (1.5 if n_silabas in (2, 5) else 3.0)
+    else:
+        # Una sola palabra de 2 sílabas es el peor caso para falsos positivos: poco material
+        # acústico y, casi siempre, esqueleto consonántico muy común.
+        penal_silabas = 0.0 if n_silabas >= 4 else (2.0 if n_silabas == 3 else 4.0)
     puntuacion = (
         math.log1p(por_millon(bigrama))
         + 0.5 * math.log1p(por_millon(freq_nombre))
@@ -118,16 +127,23 @@ def main(argv=None) -> int:
     p.add_argument("--tsv", required=True)
     p.add_argument("--salida", required=True)
     p.add_argument("--top", type=int, default=10)
+    p.add_argument("--nombres", help="lista separada por comas; por defecto, la andina")
+    p.add_argument("--disparadores", default="oye,oiga,hola,ok",
+                   help="disparadores separados por comas; vacío para probar el nombre solo")
+    p.add_argument("--solo-nombres", action="store_true",
+                   help="evalúa también (o solo) el nombre sin disparador")
     args = p.parse_args(argv)
 
     unigramas, bigramas, total, esqueletos = cargar_corpus(Path(args.tsv))
     print(f"corpus: {total:,} palabras | {len(unigramas):,} unigramas | "
           f"{len(bigramas):,} bigramas distintos")
 
-    resultados = [
-        evaluar(f"{d} {n}", unigramas, bigramas, total, esqueletos)
-        for d in DISPARADORES for n in NOMBRES
-    ]
+    nombres = tuple(x.strip() for x in args.nombres.split(",")) if args.nombres else NOMBRES
+    disparadores = tuple(x.strip() for x in args.disparadores.split(",") if x.strip())
+    candidatas = [f"{d} {n}" for d in disparadores for n in nombres]
+    if args.solo_nombres:
+        candidatas += list(nombres)
+    resultados = [evaluar(c, unigramas, bigramas, total, esqueletos) for c in candidatas]
     resultados.sort(key=lambda r: r["puntuacion"])
 
     salida = Path(args.salida)
