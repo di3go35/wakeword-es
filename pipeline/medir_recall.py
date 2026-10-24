@@ -62,6 +62,10 @@ def main(argv=None) -> int:
     p.add_argument("--features", required=True)
     p.add_argument("--manifiesto", required=True)
     p.add_argument("--consecutivos", type=int, default=3)
+    p.add_argument("--audio", default=None,
+                   help="carpeta de WAV para validar el clip (detecta repetición de Chatterbox)")
+    p.add_argument("--span-max", type=float, default=3.5,
+                   help="segundos de voz máximos razonables para una frase de dos palabras")
     p.add_argument("--salida", default=None)
     args = p.parse_args(argv)
 
@@ -70,6 +74,7 @@ def main(argv=None) -> int:
 
     maximos: list[float] = []
     puntajes_por_clip: list[np.ndarray] = []
+    descartes: list[dict] = []
     sin_features = 0
     for linea in Path(args.manifiesto).read_text(encoding="utf-8").splitlines():
         if not linea.strip():
@@ -79,6 +84,20 @@ def main(argv=None) -> int:
         if not npy.exists():
             sin_features += 1
             continue
+        if args.audio:
+            # Chatterbox a veces entra en repetición y devuelve 5-7 s para una frase de dos
+            # palabras. Puntuar eso mediría el fallo del TTS, no el del wakeword.
+            import soundfile as sf
+
+            wav = Path(args.audio) / fila["archivo"]
+            if wav.exists():
+                audio, sr = sf.read(wav, dtype="float32", always_2d=False)
+                activo = np.flatnonzero(np.abs(audio) > 1e-4)
+                span = (activo[-1] - activo[0] + 1) / sr if activo.size else 0.0
+                if span > args.span_max or span < 0.6:
+                    descartes.append({"archivo": fila["archivo"], "span_s": round(span, 2),
+                                      "motivo": f"duración de voz fuera de rango ({span:.2f} s)"})
+                    continue
         datos = np.load(npy)
         if datos.shape[1] != DIM:
             sin_features += 1
@@ -91,7 +110,10 @@ def main(argv=None) -> int:
         raise SystemExit("no hay clips puntuados: revisa --features y --manifiesto")
 
     umbrales = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    print(f"clips puntuados: {len(maximos)} | sin características: {sin_features}")
+    print(f"clips puntuados: {len(maximos)} | descartados: {len(descartes)} | "
+          f"sin características: {sin_features}")
+    for d in descartes[:5]:
+        print(f"  descartado {d['archivo']}: {d['motivo']}")
     print(f"prob. máxima: mediana {np.median(maximos):.4f} | min {min(maximos):.4f} | "
           f"max {max(maximos):.4f}")
     print(f"\n{'umbral':>7} {'recall':>8} {'detectados':>11}")
@@ -109,6 +131,7 @@ def main(argv=None) -> int:
             "prob_max_min": round(min(maximos), 4),
             "prob_max_max": round(max(maximos), 4),
             "recall_por_umbral": {f"{u:.2f}": round(r, 4) for u, r in curva.items()},
+            "descartes": descartes,
         }, indent=2, ensure_ascii=False), encoding="utf-8")
         print(f"escrito en {args.salida}")
     return 0
