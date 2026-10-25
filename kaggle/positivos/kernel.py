@@ -19,11 +19,41 @@ import sys
 import time
 from pathlib import Path
 
-TOTAL = int(os.environ.get("TOTAL_CLIPS", "600"))
+TOTAL = int(os.environ.get("TOTAL_CLIPS", "40"))
 FRASE = "hey celeste"
-VARIANTES = ("hey celeste", "Hey, Celeste.", "hey... celeste", "¡Hey Celeste!", "Hey celeste.")
+# Sin puntos suspensivos: la variante "hey... celeste" era la que más empujaba a Chatterbox a
+# repetir la frase (132 de 434 clips salieron duplicados).
+VARIANTES = ("hey celeste", "Hey, Celeste.", "¡Hey Celeste!", "Hey celeste.")
+TEMPERATURA = (0.45, 0.75)   # más baja = menos divagación
 SR_SALIDA = 16_000
 SEMILLA = 20261025
+
+
+def segmentos_voz(x, sr):
+    """Segmentos con voz: RMS por tramas de 25 ms, umbral -40 dBFS, fusiona huecos < 0,6 s."""
+    import numpy as np
+
+    n, hop = int(0.025 * sr), int(0.010 * sr)
+    if len(x) < n:
+        return []
+    t = np.lib.stride_tricks.sliding_window_view(x, n)[::hop]
+    db = 20 * np.log10(np.sqrt((t ** 2).mean(axis=1) + 1e-12))
+    act, segs, ini = db > -40.0, [], None
+    for i, a in enumerate(act):
+        if a and ini is None:
+            ini = i
+        elif not a and ini is not None:
+            segs.append([ini * hop / sr, i * hop / sr])
+            ini = None
+    if ini is not None:
+        segs.append([ini * hop / sr, len(act) * hop / sr])
+    fus = []
+    for s in segs:
+        if fus and s[0] - fus[-1][1] < 0.60:
+            fus[-1][1] = s[1]
+        else:
+            fus.append(s)
+    return [(a, b) for a, b in fus if b - a >= 0.15]
 
 
 def instalar() -> None:
@@ -68,6 +98,7 @@ def main() -> int:
     salida = Path("/kaggle/working/clips")
     salida.mkdir(parents=True, exist_ok=True)
     manifiesto = salida / "manifiesto.jsonl"
+    descartes = salida / "descartes.jsonl"
     rng = random.Random(SEMILLA)
 
     generados = 0
@@ -77,17 +108,30 @@ def main() -> int:
             variante = FRASE if i == 0 else rng.choice(VARIANTES)
             exageracion = round(rng.uniform(0.25, 0.85), 2)
             cfg = round(rng.uniform(0.25, 0.7), 2)
-            temperatura = round(rng.uniform(0.55, 0.9), 2)
+            temperatura = round(rng.uniform(*TEMPERATURA), 2)
 
             inicio = time.time()
             wav = modelo.generate(variante, language_id="es", exaggeration=exageracion,
                                   cfg_weight=cfg, temperature=temperatura)
             audio = wav.squeeze().cpu().numpy().astype("float32")
 
-            # Chatterbox a veces entra en repetición: "hey celeste" de 6 s es basura, no frase.
-            activo = np.flatnonzero(np.abs(audio) > 1e-4)
-            span = (activo[-1] - activo[0] + 1) / modelo.sr if activo.size else 0.0
-            if span > 3.5 or span < 0.6:
+            # Validación estricta: UNA sola frase (fusionando huecos < 0,6 s) y 0,9-2,0 s de voz.
+            # Contar clips no sirve: lo que manda es cuántos sirven.
+            segs = segmentos_voz(audio, modelo.sr)
+            voz = sum(b - a for a, b in segs)
+            motivo = ""
+            if len(segs) == 0:
+                motivo = "sin voz detectable"
+            elif len(segs) > 1:
+                motivo = f"frase repetida ({len(segs)} segmentos)"
+            elif voz < 0.9:
+                motivo = f"voz demasiado corta ({voz:.2f} s)"
+            elif voz > 2.0:
+                motivo = f"voz demasiado larga ({voz:.2f} s)"
+            if motivo:
+                descartes.write(json.dumps({"variante": variante, "temperatura": temperatura,
+                                            "motivo": motivo}, ensure_ascii=False) + "\n")
+                descartes.flush()
                 descartados += 1
                 continue
 
@@ -114,7 +158,8 @@ def main() -> int:
                 print(f"{generados} válidos ({descartados} descartados) | "
                       f"{time.time() - inicio:.1f}s el último", flush=True)
 
-    print(f"LISTO: {generados} válidos, {descartados} descartados por repetición")
+    print(f"LISTO: {generados} válidos de {TOTAL} pedidos, {descartados} descartados")
+    print(f"tasa de descarte: {descartados / TOTAL:.1%}")
     return 0
 
 
