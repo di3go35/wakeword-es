@@ -27,11 +27,19 @@ SEMILLA = 20261025
 
 
 def instalar() -> None:
-    """chatterbox-tts no viene en la imagen de Kaggle."""
+    """chatterbox-tts no viene en la imagen de Kaggle.
+
+    Trampa de la imagen: trae `torchvision` compilado contra otra versión de `torch`, y al mover
+    `torch` el operador `torchvision::nms` deja de existir. Eso rompe el import de `transformers`
+    (`Could not import module 'LlamaModel'`) y el kernel muere antes de generar nada.
+    En el VPS no pasa porque allí torchvision no está instalado: aquí se desinstala.
+    """
     subprocess.run(
         [sys.executable, "-m", "pip", "install", "-q", "chatterbox-tts", "soundfile"],
         check=True,
     )
+    subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "torchvision"],
+                   check=False, capture_output=True)
 
 
 def main() -> int:
@@ -45,7 +53,12 @@ def main() -> int:
     print("GPU disponible:", torch.cuda.is_available(),
           "|", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU")
 
-    from chatterbox.mtl_tts import ChatterboxMultilingualTTS
+    # comprobación explícita: si el entorno está roto, que falle con un mensaje legible
+    try:
+        from chatterbox.mtl_tts import ChatterboxMultilingualTTS
+    except Exception as e:
+        print("FALLO AL IMPORTAR CHATTERBOX:", repr(e))
+        raise
 
     dispositivo = "cuda" if torch.cuda.is_available() else "cpu"
     t0 = time.time()

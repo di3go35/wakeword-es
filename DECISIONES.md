@@ -44,6 +44,8 @@ quedó abierto está nombrado como pendiente al final.
 
 | 34 | Positivos: **no** basta un solo motor TTS | La cabeza entrenada solo con Kokoro da recall 1,000 con las tres voces de Kokoro (incluida `em_santa`, no vista en entrenamiento) y **recall 0,000 con Chatterbox** (0 de 10 clips válidos, prob. máxima 0,399). Aprende el motor, no la frase. Los positivos deben cubrir varios motores **y** aumentación a nivel de audio (ruido, EQ, reverberación, tono) porque el embedding está congelado y solo cambia si cambia el audio | El control de «otras frases con la misma voz» da 0,0000 y no detecta este fallo: solo descarta que el modelo detecte cualquier TTS. La disjunción por motor ya estaba decidida; esto demuestra que además hay que **entrenar** con varios motores | Cerrada |
 
+| 35 | Filtro de positivos TTS: una sola frase por clip | Se descarta todo clip con más de un segmento de voz (fusión de huecos < 0,6 s) o con duración de voz fuera de 0,9-2,0 s. El filtro anterior (>3,5 s) dejó pasar frases repetidas: 130 de 434 clips de Chatterbox superaban 2,2 s de voz. Consecuencia medida: por la regla de «la frase completa debe caber en la ventana», **170 de 434 clips aportaron 0 ventanas positivas** y se perdieron en silencio | Un clip con la frase dos veces no contamina (no aporta ventanas), pero desperdicia el 39% del conjunto y hace que el recall se mida sobre frases repetidas, a veces con la segunda cortada | Cerrada |
+
 ## Pendientes (nombrados como pendientes, no decididos)
 
 1. **La frase exacta.** Se elegirá por medición en la fase 3; hoy no hay frase decidida.
