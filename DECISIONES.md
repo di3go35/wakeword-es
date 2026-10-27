@@ -46,6 +46,8 @@ quedó abierto está nombrado como pendiente al final.
 
 | 35 | Filtro de positivos TTS: una sola frase por clip | Se descarta todo clip con más de un segmento de voz (fusión de huecos < 0,6 s) o con duración de voz fuera de 0,9-2,0 s. El filtro anterior (>3,5 s) dejó pasar frases repetidas: 130 de 434 clips de Chatterbox superaban 2,2 s de voz. Consecuencia medida: por la regla de «la frase completa debe caber en la ventana», **170 de 434 clips aportaron 0 ventanas positivas** y se perdieron en silencio | Un clip con la frase dos veces no contamina (no aporta ventanas), pero desperdicia el 39% del conjunto y hace que el recall se mida sobre frases repetidas, a veces con la segunda cortada | Cerrada |
 
+| 36 | Datos limpios de TTS, no solo más datos | Con 964 clips limpios de Chatterbox (filtro de una sola frase, 0,9-2,0 s, rachas finas <=2) el modelo multi-motor da **recall 99,5% entre motores y 0,019 FA/h** (98,4% y 0,000 a umbral 0,7). Con los 434 clips sucios de antes daba 83,7% y 0,170 FA/h: la limpieza mejoró **los dos lados** | Los clips con frase duplicada o truncada enseñaban patrones falsos (activarse con media frase), lo que empeoraba recall y falsos positivos a la vez. Más clips sucios es peor que menos clips limpios | Cerrada |
+
 ## Pendientes (nombrados como pendientes, no decididos)
 
 1. **La frase exacta.** Se elegirá por medición en la fase 3; hoy no hay frase decidida.

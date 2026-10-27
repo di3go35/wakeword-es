@@ -19,7 +19,9 @@ import sys
 import time
 from pathlib import Path
 
-TOTAL = int(os.environ.get("TOTAL_CLIPS", "40"))
+# Chatterbox descarta ~72% de sus salidas en español (frase repetida, demasiado larga o
+# corta) y los parámetros no lo cambian: se pide 4x para quedarse con ~800 limpios.
+TOTAL = int(os.environ.get("TOTAL_CLIPS", "3000"))
 FRASE = "hey celeste"
 # Sin puntos suspensivos: la variante "hey... celeste" era la que más empujaba a Chatterbox a
 # repetir la frase (132 de 434 clips salieron duplicados).
@@ -99,6 +101,7 @@ def main() -> int:
     salida.mkdir(parents=True, exist_ok=True)
     manifiesto = salida / "manifiesto.jsonl"
     descartes = salida / "descartes.jsonl"
+    dfile = descartes.open("w", encoding="utf-8")   # un Path no tiene .write()
     rng = random.Random(SEMILLA)
 
     generados = 0
@@ -129,9 +132,9 @@ def main() -> int:
             elif voz > 2.0:
                 motivo = f"voz demasiado larga ({voz:.2f} s)"
             if motivo:
-                descartes.write(json.dumps({"variante": variante, "temperatura": temperatura,
-                                            "motivo": motivo}, ensure_ascii=False) + "\n")
-                descartes.flush()
+                dfile.write(json.dumps({"variante": variante, "temperatura": temperatura,
+                                        "motivo": motivo}, ensure_ascii=False) + "\n")
+                dfile.flush()
                 descartados += 1
                 continue
 
@@ -151,6 +154,8 @@ def main() -> int:
                 "archivo": nombre, "motor": "chatterbox", "variante": variante,
                 "exageracion": exageracion, "cfg": cfg, "temperatura": temperatura,
                 "segundos": round(len(audio) / SR_SALIDA, 3),
+                "voz_s": round(voz, 3),
+                "rachas_finas": len(segs),
             }, ensure_ascii=False) + "\n")
             mf.flush()
             generados += 1
@@ -158,6 +163,7 @@ def main() -> int:
                 print(f"{generados} válidos ({descartados} descartados) | "
                       f"{time.time() - inicio:.1f}s el último", flush=True)
 
+    dfile.close()
     print(f"LISTO: {generados} válidos de {TOTAL} pedidos, {descartados} descartados")
     print(f"tasa de descarte: {descartados / TOTAL:.1%}")
     return 0

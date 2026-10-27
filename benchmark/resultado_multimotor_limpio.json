@@ -1,0 +1,30 @@
+{
+  "fecha": "2026-10-26",
+  "modelo": "cabeza 1536-128-1 sobre embedding congelado, 11479 ventanas positivas (Kokoro+Chatterbox limpio) + 151396 negativas reales",
+  "conjunto_test": "test de desarrollo: 37106 clips / 53,03 h de habla real, 10 condiciones de acento (NO es test final: se ha mirado ~10 veces)",
+  "umbral_0.5": {
+    "recall_chatterbox_192_heldout": 0.995,
+    "recall_kokoro_em_santa": 0.992,
+    "fa_por_hora": 0.019
+  },
+  "umbral_0.7": {
+    "recall_chatterbox_192_heldout": 0.984,
+    "recall_kokoro_em_santa": 0.983,
+    "fa_por_hora": 0.0
+  },
+  "comparacion": {
+    "solo_kokoro": {
+      "recall_chatterbox": 0.067,
+      "fa_por_hora_0.5": 0.019
+    },
+    "multi_motor_sucio": {
+      "recall_chatterbox": 0.837,
+      "fa_por_hora_0.5": 0.17
+    },
+    "multi_motor_limpio": {
+      "recall_chatterbox": 0.995,
+      "fa_por_hora_0.5": 0.019
+    }
+  },
+  "pendiente": "recall con voz humana real (unico juez), minado de negativos dificiles, aumentacion con ruido"
+}
