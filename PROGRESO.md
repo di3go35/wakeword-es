@@ -18,6 +18,13 @@ Registro cronológico del trabajo autónomo. Horas en UTC (tu hora = UTC-5).
 | 18:05 | Prueba few-shot (dejando una grabación fuera) en curso: 10 pliegues. |
 | 18:33 | Características de augmentados: 4.203 de 5.400. MUSAN descargando (4,7 de ~11 GB). |
 
+| 18:36 | **Few-shot: 87,5% de recall** dejando una grabación fuera (9 en entrenamiento + TTS). Zero-shot: 0%. |
+| 18:48 | Lanzado v4 (TTS + aumentación de canal) bajo systemd. |
+| 19:03 | v4: la probabilidad con voz humana sube 5× (0,0123 → 0,0634) pero el recall sigue en 0. |
+| 19:12 | Modelo few-shot final: recall 10/10 en muestra, pero **4,469 FA/h** (el few-shot dispara en habla ajena). |
+| 19:18 | Minados 2.844 negativos difíciles → **0,094 FA/h** con recall intacto. |
+| 19:20 | Validación cruzada con negativos difíciles en curso. |
+
 ## Pendiente inmediato
 
 1. Terminar características de augmentados → entrenar v4 → medir voz humana otra vez.

@@ -52,11 +52,17 @@ def main(argv=None) -> int:
     p.add_argument("--datos", required=True)
     p.add_argument("--epochs", type=int, default=12)
     p.add_argument("--semilla", type=int, default=20261026)
+    p.add_argument("--neg-dificiles", default=None)
+    p.add_argument("--peso-dificiles", type=float, default=3.0)
     args = p.parse_args(argv)
 
     datos = Path(args.datos)
     x_tts = np.load(datos / "pos_train.npy").astype(np.float32)
     x_neg = np.load(datos / "neg_train.npy").astype(np.float32)
+    if args.neg_dificiles and Path(args.neg_dificiles).exists():
+        x_dif = np.load(args.neg_dificiles).astype(np.float32)
+        x_neg = np.concatenate([x_neg] + [x_dif] * max(1, int(args.peso_dificiles)))
+        print(f"negativos difíciles en el pliegue: {len(x_dif)}")
     print(f"TTS: {len(x_tts)} ventanas | negativos reales: {len(x_neg)}")
 
     reales = sorted(Path(args.reales).glob("diego_*.wav"))

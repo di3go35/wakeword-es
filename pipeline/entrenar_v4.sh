@@ -19,12 +19,12 @@ info() { echo "[$(date '+%H:%M:%S')] $*"; }
 
 info "arrays de los aumentados"
 "$P" "$REPO/pipeline/agregar_motor.py" --features "$BASE/features_aug_kokoro" \
-     --manifiesto "$BASE/features_aug_kokoro/manifiesto_aug_kokoro.jsonl" \
+     --manifiesto "$BASE/positivos/aug_kokoro/manifiesto.jsonl" \
      --audio "$BASE/positivos/aug_kokoro" --salida "$E" --prefijo augk --voz-val em_santa \
      || { info "ABORTO en aug kokoro"; exit 2; }
 
 "$P" "$REPO/pipeline/agregar_motor.py" --features "$BASE/features_aug_cb" \
-     --manifiesto "$BASE/features_aug_cb/manifiesto_aug_cb.jsonl" \
+     --manifiesto "$BASE/positivos/aug_cb/manifiesto_limpio.jsonl" \
      --audio "$BASE/positivos/aug_cb" --salida "$E" --prefijo augc \
      --val-list "$E/cbv5_val.txt" \
      || { info "ABORTO en aug chatterbox"; exit 3; }

@@ -1,0 +1,20 @@
+{
+  "modelo": "/home/di3gor35/datos-cv/entrenamiento/cabeza.onnx",
+  "clips": 10,
+  "consecutivos": 3,
+  "prob_max_mediana": 0.0002,
+  "prob_max_min": 0.0,
+  "prob_max_max": 0.1259,
+  "recall_por_umbral": {
+    "0.10": 0.0,
+    "0.20": 0.0,
+    "0.30": 0.0,
+    "0.40": 0.0,
+    "0.50": 0.0,
+    "0.60": 0.0,
+    "0.70": 0.0,
+    "0.80": 0.0,
+    "0.90": 0.0
+  },
+  "descartes": []
+}
