@@ -30,6 +30,10 @@ Registro cronológico del trabajo autónomo. Horas en UTC (tu hora = UTC-5).
 | 20:40 | Validación cruzada del recetario completo, con ruido no visto: **100% (10 de 10)**. |
 | 21:10 | Curva de FA/h completa y punto de operación fijado en 0,9. |
 
+| 21:35 | Silencio: 0 activaciones en 30 min (ceros y ruido térmico -70 dBFS). |
+| 21:45 | Campo lejano simulado (3 m, RIR 0,5 s): 100% de recall. |
+| 21:50 | Consolidado `docs/resultados.md` con todas las cifras y los enfoques descartados. |
+
 ## Pendiente inmediato
 
 1. Terminar características de augmentados → entrenar v4 → medir voz humana otra vez.

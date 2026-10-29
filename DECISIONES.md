@@ -55,6 +55,8 @@ quedó abierto está nombrado como pendiente al final.
 
 | 40 | Recetario final y punto de operación | Modelo few-shot: positivos TTS (Kokoro+Chatterbox, originales y aumentados), grabaciones del usuario aumentadas (canal + ruido MUSAN), negativos reales y negativos difíciles minados dos veces. **Umbral 0,9 con 3 frames consecutivos y 1 s de enfriamiento**. Validación dejando un audio fuera **con ruido no visto: 100% (10/10)**. Falsos positivos sobre 53 h: **0,151 FA/h** a 0,9 (0,396 a 0,5; 0,245 a 0,8; 0,113 a 0,95) | El criterio es ≤0,5 FA/h y ≥95% de recall: el umbral 0,9 lo cumple con margen, pero el recall está medido sobre 10 grabaciones de una sola persona y sesión, así que la cifra publicable necesita más hablantes | Cerrada |
 
+| 41 | Las tres condiciones del criterio, medidas | Limpio: 100% (en muestra). Ruido no visto: 100% (dejando un audio fuera). Campo lejano 3 m simulado (RIR 0,5 s, paso bajo 5 kHz, -18 dBFS): 100%. Silencio digital 30 min: 0 activaciones (máx 0,0799). Ruido térmico -70 dBFS 30 min: 0 activaciones (máx 0,0070) | El campo lejano es **simulado**, no grabado a 3 m con un móvil: es una condición aproximada. El silencio sí es exacto: ceros y ruido térmico reales. La comprobación definitiva de las tres condiciones necesita grabaciones nuevas en cada condición | Cerrada |
+
 ## Pendientes (nombrados como pendientes, no decididos)
 
 1. **La frase exacta.** Se elegirá por medición en la fase 3; hoy no hay frase decidida.
