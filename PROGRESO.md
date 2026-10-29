@@ -37,9 +37,21 @@ Registro cronológico del trabajo autónomo. Horas en UTC (tu hora = UTC-5).
 | 22:30 | Especificidad: 4 de 30 frases con "celeste" disparaban; añadidas como negativos → **0 de 30**, y el FA/h baja a **0,113**. |
 | 23:00 | Validación final dejando un audio fuera con el recetario completo: **100% (10/10)**. |
 
+## 2026-10-27 (continuación autónoma)
+
+| Hora UTC | Qué pasó |
+|---|---|
+| — | Fase 6.1 implementada: `pipeline/antidisparo.py` (compuerta RMS, frames consecutivos, enfriamiento). |
+| — | Compuerta a −45 dBFS: limpio 100%, lejano 3 m **100%**, ruido 66% (igual que sin compuerta). A −35 el lejano cae a 40%: descartado por medición. |
+| — | **Corrección importante**: el 100% de recall en ruido era la mediana de puntuación, no la regla operativa. Con 3 frames sobre 0,9: **66%**. Sin compuerta también 66%: no es la compuerta. No depende del SNR (fallos hasta +19 dB). |
+| — | `docs/resultados.md`, `README.md` y `MODEL_CARD.md` corregidos con las dos cifras y el desglose por SNR. Decisiones 43 y 44. |
+| — | Job `wakeword-compuerta` midiendo el FA/h con compuerta sobre las 53 h (decodifica audio, lento). |
+
 ## Pendiente inmediato
 
-1. Terminar características de augmentados → entrenar v4 → medir voz humana otra vez.
-2. Few-shot: ¿bastan 10 grabaciones del usuario?
-3. Con MUSAN completo: segunda pasada de aumentación con ruido real.
-4. Si ninguna palanca levanta el recall humano: cambiar de arquitectura (candidato A/B).
+1. **Recall en ruido (66%)**: es la única condición que no cumple el criterio. Necesita más
+   variedad de canal en los positivos reales (más grabaciones, más condiciones), no más ruido sintético.
+2. `calibrar` (fase 6.2): umbral por entorno. El ruido no mejora bajando el umbral (66% → 69% al pasar
+   de 0,9 a 0,5), así que un umbral adaptativo no arregla esta condición: hace falta dato.
+3. Test público 100% sintético con disjunción por motor (fase 5.1), para que un tercero reproduzca.
+4. Demo Android con paridad numérica Python ↔ Android (fase 9).
