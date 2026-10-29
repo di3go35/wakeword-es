@@ -29,7 +29,8 @@ DIM = 96
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--features-reales", required=True)
+    p.add_argument("--features-reales", default=None)
+    p.add_argument("--reales-npy", default=None, help="tensor ya armado (n,16,96) en vez de carpeta")
     p.add_argument("--datos", required=True)
     p.add_argument("--epochs", type=int, default=15)
     p.add_argument("--batch", type=int, default=256)
@@ -50,13 +51,18 @@ def main(argv=None) -> int:
         x_neg = np.concatenate([x_neg] + [x_dif] * repeticiones)
         print(f"negativos difíciles: {len(x_dif)} x{repeticiones}")
 
-    reales = []
-    for npy in sorted(Path(args.features_reales).glob("*.npy")):
+    if args.reales_npy:
+        x_real = np.load(args.reales_npy).astype(np.float32)
+        print(f"tensor de voz real cargado: {x_real.shape}")
+        reales = []
+    reales = reales if not args.reales_npy else []
+    for npy in ([] if args.reales_npy else sorted(Path(args.features_reales).glob("*.npy"))):
         d = np.load(npy)
         if d.shape[0] >= VENTANA and d.shape[1] == DIM:
             w = np.lib.stride_tricks.sliding_window_view(d, (VENTANA, DIM))[:, 0]
             reales.append(w.astype(np.float32))
-    x_real = np.concatenate(reales) if reales else np.zeros((0, VENTANA, DIM), np.float32)
+    if not args.reales_npy:
+        x_real = np.concatenate(reales) if reales else np.zeros((0, VENTANA, DIM), np.float32)
     print(f"TTS: {len(x_tts)} | voz real aumentada: {len(x_real)} | negativos: {len(x_neg)}")
 
     x_pos = np.concatenate([x_tts, x_real])
