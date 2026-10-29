@@ -25,6 +25,11 @@ Registro cronológico del trabajo autónomo. Horas en UTC (tu hora = UTC-5).
 | 19:18 | Minados 2.844 negativos difíciles → **0,094 FA/h** con recall intacto. |
 | 19:20 | Validación cruzada con negativos difíciles en curso. |
 
+| 19:30 | Few-shot con ruido (MUSAN): recall en ruido no visto 32,5% → **100%**. FA/h sube a 0,867. |
+| 19:50 | Segundo minado de negativos → FA/h **0,396** @0,5 y 0,151 @0,9. |
+| 20:40 | Validación cruzada del recetario completo, con ruido no visto: **100% (10 de 10)**. |
+| 21:10 | Curva de FA/h completa y punto de operación fijado en 0,9. |
+
 ## Pendiente inmediato
 
 1. Terminar características de augmentados → entrenar v4 → medir voz humana otra vez.

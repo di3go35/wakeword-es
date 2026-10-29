@@ -50,6 +50,7 @@ def main(argv=None) -> int:
     p.add_argument("--ruido", default=str(Path.home() / "datos-cv/features_diego_ruido/*_{rA}*.npy"))
     p.add_argument("--test-ruido", default=str(Path.home() / "datos-cv/features_diego_ruido_b/*_{rB}*.npy"))
     p.add_argument("--epochs", type=int, default=10)
+    p.add_argument("--neg-pliegue", type=int, default=80000)
     p.add_argument("--semilla", type=int, default=20261026)
     args = p.parse_args(argv)
 
@@ -74,14 +75,17 @@ def main(argv=None) -> int:
     for clip in clips:
         x_real = np.concatenate([w for c, w in entrenamiento if c != clip])
         x_pos = np.concatenate([x_tts, x_real])
-        x = torch.from_numpy(np.concatenate([x_pos, x_neg]))
+        # Negativos fijos y subsampleados: con 163k el tensor por pliegue no cabe en memoria.
+        x = torch.from_numpy(np.concatenate([x_pos, x_neg[: args.neg_pliegue]]))
         y = torch.from_numpy(np.concatenate([
-            np.ones(len(x_pos), dtype=np.float32), np.zeros(len(x_neg), dtype=np.float32)]))
+            np.ones(len(x_pos), dtype=np.float32),
+            np.zeros(min(len(x_neg), args.neg_pliegue), dtype=np.float32)]))
 
         torch.manual_seed(args.semilla)
         modelo = nn.Sequential(nn.Flatten(), nn.Linear(VENTANA * DIM, 128), nn.ReLU(),
                                nn.Linear(128, 1))
-        criterio = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([len(x_neg) / len(x_pos)]))
+        criterio = nn.BCEWithLogitsLoss(
+            pos_weight=torch.tensor([min(len(x_neg), args.neg_pliegue) / len(x_pos)]))
         opt = torch.optim.Adam(modelo.parameters(), lr=1e-3, weight_decay=1e-4)
         for _ in range(args.epochs):
             perm = torch.randperm(len(x))
