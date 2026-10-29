@@ -88,7 +88,7 @@ y este repositorio aporta los scripts, las particiones congeladas y los manifies
 [`PLAN.md`](PLAN.md) · [`DECISIONES.md`](DECISIONES.md) (39 decisiones con criterio y descarte) ·
 [`ARQUITECTURA.md`](ARQUITECTURA.md) · [`INVENTARIO.md`](INVENTARIO.md) ·
 [`FRASE.md`](FRASE.md) · [`PROGRESO.md`](PROGRESO.md) ·
-[`docs/resultados.md`](docs/resultados.md) · [`docs/hallazgo-voz-humana.md`](docs/hallazgo-voz-humana.md) · [`docs/integracion-android.md`](docs/integracion-android.md)
+[`docs/resultados.md`](docs/resultados.md) · [`docs/MODEL_CARD.md`](docs/MODEL_CARD.md) · [`docs/hallazgo-voz-humana.md`](docs/hallazgo-voz-humana.md) · [`docs/integracion-android.md`](docs/integracion-android.md)
 
 ## Licencia
 
