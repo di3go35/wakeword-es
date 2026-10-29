@@ -51,6 +51,8 @@ def main(argv=None) -> int:
     p.add_argument("--test-ruido", default=str(Path.home() / "datos-cv/features_diego_ruido_b/*_{rB}*.npy"))
     p.add_argument("--epochs", type=int, default=10)
     p.add_argument("--neg-pliegue", type=int, default=80000)
+    p.add_argument("--neg-extra", default=None,
+                   help="carpeta de características con frases que no deben activar")
     p.add_argument("--semilla", type=int, default=20261026)
     args = p.parse_args(argv)
 
@@ -62,6 +64,16 @@ def main(argv=None) -> int:
         x_neg = np.concatenate([x_neg, np.load(dif).astype(np.float32)] * 1)
         x_neg = np.concatenate([x_neg, np.load(dif).astype(np.float32)] *
                                (2 if len(np.load(dif)) < 5000 else 1))
+
+    if args.neg_extra:
+        extra = []
+        for npy in sorted(Path(args.neg_extra).glob("*.npy")):
+            d = np.load(npy)
+            if d.shape[0] >= VENTANA and d.shape[1] == DIM:
+                extra.append(np.lib.stride_tricks.sliding_window_view(d, (VENTANA, DIM))[:, 0])
+        if extra:
+            x_neg = np.concatenate([x_neg, np.concatenate(extra).astype(np.float32)])
+            print(f"negativos de frase en cada pliegue: {sum(len(e) for e in extra)}")
 
     entrenamiento = ventanas_con_clip(args.aug, "aug") + ventanas_con_clip(args.ruido, "ruido")
     prueba = ventanas_con_clip(args.test_ruido, "ruido_b")

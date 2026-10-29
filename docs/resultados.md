@@ -23,7 +23,7 @@ Umbral **0,9** con 3 frames consecutivos y 1 s de enfriamiento.
 | Condición | Resultado | Cómo se midió |
 |---|---|---|
 | Recall, limpio | **100%** (10/10) | En muestra; el usuario grabó esos audios |
-| Recall, ruido no visto | **100%** (10/10) | Validación dejando un audio fuera, ruido MUSAN de otra semilla |
+| Recall, ruido no visto | **100%** (10/10) | Validación dejando un audio fuera, ruido MUSAN de otra semilla, **recetario completo** |
 | Recall, campo lejano (3 m) | **100%** (10/10) | Simulado: RIR de 0,5 s, paso bajo 5 kHz, -18 dBFS |
 | Falsos positivos | **0,113 FA/h** | 6 eventos en 53,03 h de habla real |
 | Especificidad: "celeste" en frase normal | **0 de 30 disparan** | 30 frases TTS con "celeste"/"hey" (máx 0,2198) |

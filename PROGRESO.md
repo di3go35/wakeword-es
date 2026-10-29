@@ -34,6 +34,9 @@ Registro cronológico del trabajo autónomo. Horas en UTC (tu hora = UTC-5).
 | 21:45 | Campo lejano simulado (3 m, RIR 0,5 s): 100% de recall. |
 | 21:50 | Consolidado `docs/resultados.md` con todas las cifras y los enfoques descartados. |
 
+| 22:30 | Especificidad: 4 de 30 frases con "celeste" disparaban; añadidas como negativos → **0 de 30**, y el FA/h baja a **0,113**. |
+| 23:00 | Validación final dejando un audio fuera con el recetario completo: **100% (10/10)**. |
+
 ## Pendiente inmediato
 
 1. Terminar características de augmentados → entrenar v4 → medir voz humana otra vez.
