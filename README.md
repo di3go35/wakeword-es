@@ -60,6 +60,8 @@ ventanas de entrenamiento sin que el recuento de clips lo delatara.
 | `pipeline/minar_negativos.py` | Minado de falsos positivos sobre hablantes de entrenamiento |
 | `pipeline/medir_test.py` | FA/h por condición sobre el test congelado |
 | `pipeline/medir_recall.py` | Curva de recall por umbral, con descarte motivado |
+| `pipeline/antidisparo.py` | Compuerta de energía (−45 dBFS), frames consecutivos y enfriamiento |
+| `pipeline/calibrar.py` | Umbral por entorno: 10 min de audio del lugar y devuelve el umbral que cumple el objetivo de FA/h |
 | `pipeline/diagnostico_tts.py` | Control negativo: ¿detecta la frase o "esto es TTS"? |
 
 ## Reproducir
