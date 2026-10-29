@@ -23,10 +23,34 @@ Umbral **0,9** con 3 frames consecutivos y 1 s de enfriamiento.
 | Condición | Resultado | Cómo se midió |
 |---|---|---|
 | Recall, limpio | **100%** (10/10) | En muestra; el usuario grabó esos audios |
-| Recall, ruido no visto | **100%** (10/10) | Validación dejando un audio fuera, ruido MUSAN de otra semilla, **recetario completo** |
+| Recall, ruido no visto (puntuación) | 100% de los clips con mediana ≥0,99 | Mediana de la puntuación por clip, validación dejando uno fuera |
+| **Recall, ruido no visto (regla operativa)** | **66%** (53/80 variantes) | 3 frames sobre 0,9 y enfriamiento — el número que ve el usuario |
 | Recall, campo lejano (3 m) | **100%** (10/10) | Simulado: RIR de 0,5 s, paso bajo 5 kHz, -18 dBFS |
 | Falsos positivos | **0,113 FA/h** | 6 eventos en 53,03 h de habla real |
 | Especificidad: "celeste" en frase normal | **0 de 30 disparan** | 30 frases TTS con "celeste"/"hey" (máx 0,2198) |
+
+### Corrección metodológica (2026-10-26, tarde)
+
+La fila de "100% con ruido" se midió como **mediana de la puntuación por clip**, no como activación
+sostenida. Con la regla que se usa en el producto (3 frames consecutivos sobre 0,9), el recall en
+ruido es **66%**. No es un fallo de la compuerta: sin compuerta da lo mismo (66,2%). Y no depende del
+SNR: falla 45% a SNR <0 dB, 38% entre 0 y 10 dB y 26% por encima de 10 dB — es decir, hay fallos a
++19 dB. La causa probable es que la voz real con solo 10 muestras no cubre la variabilidad de canal
+(EQ + reverberación + ruido) que sí cubre el TTS.
+
+### Compuerta de energía (fase 6.1)
+
+| Piso | Recall limpio | Recall lejano 3 m | Recall ruido |
+|---|---|---|---|
+| sin compuerta | 100% | 100% | 66% |
+| −45 dBFS fijo | 100% | **100%** | 66% |
+| −60 dBFS fijo | 100% | 100% | 66% |
+| adaptativo (suelo local + 8 dB) | 100% | 100% | 66% |
+
+La compuerta **no cuesta recall en ninguna condición** y quita los disparos en silencio digital (12 → 11
+eventos en los 10 clips limpios; el evento eliminado estaba en un frame a −120 dBFS, silencio exacto).
+El riesgo que el plan advertía —que el piso rompiera el campo lejano— **no se materializa a −45**: a
+−35 sí (recall lejano 100% → 40%). Recomendación: piso **−45 dBFS**.
 | Silencio digital (30 min) | **0 activaciones** | Probabilidad máxima 0,0799 |
 | Ruido térmico -70 dBFS (30 min) | **0 activaciones** | Probabilidad máxima 0,0070 |
 

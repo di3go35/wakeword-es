@@ -67,6 +67,11 @@ def main(argv=None) -> int:
     p.add_argument("--span-max", type=float, default=3.5,
                    help="segundos de voz máximos razonables para una frase de dos palabras")
     p.add_argument("--salida", default=None)
+    p.add_argument("--piso-adaptativo", action="store_true",
+                   help="piso relativo al ruido local (margen 8 dB) en vez de fijo")
+    p.add_argument("--piso", type=float, default=None,
+                   help="piso de energía en dBFS; -45 no rompe el campo lejano")
+    p.add_argument("--enfriamiento", type=float, default=1.0)
     args = p.parse_args(argv)
 
     sesion = ort.InferenceSession(args.modelo, providers=["CPUExecutionProvider"])
@@ -103,6 +108,22 @@ def main(argv=None) -> int:
             sin_features += 1
             continue
         puntajes = puntuar(sesion, datos)
+        if args.audio and args.piso is not None:
+            import antidisparo
+            import soundfile as sf
+            wav = Path(args.audio) / fila["archivo"]
+            if wav.exists():
+                audio, sr = sf.read(wav, dtype="float32", always_2d=False)
+                if audio.ndim > 1:
+                    audio = audio.mean(axis=1)
+                if sr != antidisparo.SR:
+                    from scipy.signal import resample_poly
+                    audio = resample_poly(audio, antidisparo.SR, sr).astype(np.float32)
+                energias = antidisparo.energia_por_frame(audio)
+                if args.piso_adaptativo:
+                    puntajes = antidisparo.aplicar_compuerta_adaptativa(puntajes, energias)
+                else:
+                    puntajes = antidisparo.aplicar_compuerta(puntajes, energias, args.piso)
         puntajes_por_clip.append(puntajes)
         maximos.append(float(puntajes.max()))
 

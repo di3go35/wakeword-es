@@ -28,7 +28,7 @@ ventanas que cortan la frase entran como negativas.
 | Condición | Resultado |
 |---|---|
 | Recall limpio | 100% (10/10, en muestra) |
-| Recall con ruido no visto | 100% (10/10, dejando un audio fuera) |
+| Recall con ruido no visto | 66% por intento (53/80 variantes con la regla operativa); 100% de los clips con mediana ≥0,99 |
 | Recall campo lejano 3 m (simulado) | 100% (10/10) |
 | Falsos positivos @0,9 | **0,113 FA/h** (6 eventos en 53 h) |
 | Falsos positivos @0,8 | 0,113 FA/h |
