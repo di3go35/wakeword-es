@@ -48,6 +48,8 @@ quedó abierto está nombrado como pendiente al final.
 
 | 36 | Datos limpios de TTS, no solo más datos | Con 964 clips limpios de Chatterbox (filtro de una sola frase, 0,9-2,0 s, rachas finas <=2) el modelo multi-motor da **recall 99,5% entre motores y 0,019 FA/h** (98,4% y 0,000 a umbral 0,7). Con los 434 clips sucios de antes daba 83,7% y 0,170 FA/h: la limpieza mejoró **los dos lados** | Los clips con frase duplicada o truncada enseñaban patrones falsos (activarse con media frase), lo que empeoraba recall y falsos positivos a la vez. Más clips sucios es peor que menos clips limpios | Cerrada |
 
+| 37 | La voz humana real es el muro | 10 grabaciones reales de Diego (micrófono de laptop, pico -16 a -28 dBFS) dan **recall 0,000 y probabilidad máxima 0,0123** con el modelo multi-motor, incluso normalizando a -6 dBFS. El ASR (whisper medium sobre normalizado) confirma que el audio dice «hey celeste», así que no es un artefacto. El modelo reconoce sintetizadores, no personas. Palanca: aumentación de canal sobre los positivos (ganancia −30 a −6 dBFS, respuesta de micrófono, reverberación) | El minado de negativos difíciles no ayuda aquí: solo 24 ventanas de 1,1 M superan 0,10, es decir el modelo ya es demasiado conservador con habla real. El problema no son los falsos positivos sino la brecha de dominio TTS→humano | Cerrada |
+
 ## Pendientes (nombrados como pendientes, no decididos)
 
 1. **La frase exacta.** Se elegirá por medición en la fase 3; hoy no hay frase decidida.

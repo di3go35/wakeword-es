@@ -52,6 +52,10 @@ def main(argv=None) -> int:
     p.add_argument("--salida", required=True)
     p.add_argument("--prefijo", required=True)
     p.add_argument("--val-frac", type=float, default=0.2)
+    p.add_argument("--val-list", default=None,
+                   help="archivo con los clips que van a validación (para respetar un split ya hecho)")
+    p.add_argument("--voz-val", default=None,
+                   help="sufijo de voz que va a validación (p. ej. em_santa); el resto a train")
     p.add_argument("--semilla", type=int, default=20261025)
     args = p.parse_args(argv)
 
@@ -59,9 +63,19 @@ def main(argv=None) -> int:
     features, audio_dir = Path(args.features), Path(args.audio)
     filas = [json.loads(l) for l in Path(args.manifiesto).read_text(
         encoding="utf-8").splitlines() if l.strip()]
-    rng.shuffle(filas)
-    n_val = max(1, int(len(filas) * args.val_frac))
-    en_val = set(f["archivo"] for f in filas[:n_val])
+    if args.val_list:
+        # Se compara por el clip de origen: los aumentados heredan el split de su original.
+        permitidos = set(Path(args.val_list).read_text().split())
+        en_val = {f["archivo"] for f in filas
+                  if Path(f["archivo"]).stem.split("_aug")[0] + ".wav" in permitidos}
+        n_val = len(en_val)
+    elif args.voz_val:
+        en_val = {f["archivo"] for f in filas if args.voz_val in f["archivo"]}
+        n_val = len(en_val)
+    else:
+        rng.shuffle(filas)
+        n_val = max(1, int(len(filas) * args.val_frac))
+        en_val = set(f["archivo"] for f in filas[:n_val])
 
     train, val, sin_span = [], [], []
     for fila in filas:
@@ -89,8 +103,9 @@ def main(argv=None) -> int:
         np.save(ruta, np.stack(datos))
         print(f"{nombre}: {len(datos)} ventanas -> {ruta.name}")
 
-    (salida / f"{args.prefijo}_val.txt").write_text("\n".join(sorted(en_val)) + "\n",
-                                                    encoding="utf-8")
+    if not args.val_list and not args.voz_val:
+        (salida / f"{args.prefijo}_val.txt").write_text("\n".join(sorted(en_val)) + "\n",
+                                                        encoding="utf-8")
     print(f"clips: {len(filas)} | a validación: {n_val} (lista en {args.prefijo}_val.txt) | "
           f"sin señal: {len(sin_span)}")
     return 0
