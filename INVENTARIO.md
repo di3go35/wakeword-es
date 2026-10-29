@@ -22,15 +22,15 @@
 
 | Evidencia | Fase | Cómo se verifica desde fuera |
 |---|---|---|
-| Curva DET de la línea base (números malos publicados) | 2 | Repo público + comando reproducible |
-| Frase congelada con su justificación medida | 3 | `FRASE.md` + hash de commit |
-| Registro de procedencia de cada fuente con licencia y hash | 4 | `PROCEDENCIA.md` |
-| Consentimientos escritos de 10–15 personas | 4 | Referencias por hash (los PDF no se publican) |
+| Curva DET de la línea base (números malos publicados) | 2 | **Hecha**: `benchmark/resultado_linea_base*.json` (0,773 → 0,019 FA/h tras corregir el etiquetado) |
+| Frase congelada con su justificación medida | 3 | **Hecha**: `FRASE.md` + `benchmark/FRASE_HASH` (`f2a3f422…`) |
+| Registro de procedencia de cada fuente con licencia y hash | 4 | **Hecha** para Common Voice (`PROCEDENCIA.txt`, SHA256 `b7c1f303…`); MUSAN y TTS documentados en `docs/MODEL_CARD.md` |
+| Consentimientos escritos de 10–15 personas | 4 | **Parcial**: solo la voz del autor (10 grabaciones). Falta el resto del piloto |
 | Características de los 3 lotes (620 h) | 4 | **Verificado**: lote 000 (170.930 clips, 250,00 h) y lote 001 (179.918 útiles de 179.924, 250,00 h, 6 descartes con motivo documentado) pasan `verificar_features.py` sin faltantes sin explicación. Lote 002 (119,95 h) en ejecución. Factor medido: 21,9× por proceso, 12 h 41 min de CPU en el lote 001 |
-| Test congelado con hashes publicados antes de entrenar | 5 | Hash en el repo antes del primer entrenamiento |
-| Curva DET del modelo final vs línea base | 6 | Tabla comparativa en el repo |
-| 30 min de silencio digital = 0 activaciones | 6 | Log del test |
-| Delta del minado de falsos positivos | 7 | Reporte antes/después |
+| Test congelado con hashes publicados antes de entrenar | 5 | **Hecha pero degradada**: `benchmark/SPLIT_HASH` y `benchmark/test_negativos.json` publicados, con la salvedad de que el test se usó ~10 veces como test de desarrollo |
+| Curva DET del modelo final vs línea base | 6 | **Hecha**: `docs/resultados.md` con la curva completa de FA/h y el cuadro de enfoques fallidos |
+| 30 min de silencio digital = 0 activaciones | 6 | **Hecha**: 0 activaciones en ceros y en ruido térmico a -70 dBFS (máx 0,0799) |
+| Delta del minado de falsos positivos | 7 | **Hecha**: 4,469 → 0,094 FA/h (47×) con recall intacto; segundo minado 0,867 → 0,396 |
 | Modelo cargable y reproducible por un tercero | 8 | URL + instrucciones |
 | Consumo de batería (%/h) y latencia p95 en Android | 9 | Video + tabla con método |
 | Paridad numérica Python ↔ Android | 9 | Test frame por frame sobre el mismo WAV |
@@ -70,3 +70,17 @@ Se completa en la fase 4. Una fila por fuente; sin fila, la fuente no entra al p
 | Fuente | Tipo | Licencia | URL | Hash | Uso comercial | Fecha de verificación |
 |---|---|---|---|---|---|---|
 | (pendiente) | | | | | | |
+
+## 6. Estado de los artefactos (2026-10-26)
+
+| Artefacto | Estado | Evidencia |
+|---|---|---|
+| Corpus de negativos | 440.788 clips / 619,95 h → características 96-dim | tres lotes verificados, 6 descartes documentados |
+| Partición por hablante | Congelada | 14.441 train / 3.247 test, hash `9e237c2d…` |
+| Audio de test | 37.106 clips / 53,03 h | `benchmark/test_negativos.json` |
+| Frase | `hey celeste` | `FRASE.md`, medición sobre 10,9 M palabras |
+| Positivos Kokoro | 1.800 clips, `es-419` (seseo) | manifiesto con hash por clip |
+| Positivos Chatterbox | 964 limpios de 1.043 descargados | filtro de frase única y 0,9-2,0 s |
+| Modelo final | `cabeza_fewshot.onnx`, 196.865 parámetros | `docs/MODEL_CARD.md` |
+| Medición | 53,03 h, 10 condiciones de acento | `docs/resultados.md` |
+| Reproducibilidad | `make test` 12/12, `make autotest` falla como debe | CI manual documentado |
