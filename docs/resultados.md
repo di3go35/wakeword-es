@@ -25,7 +25,8 @@ Umbral **0,9** con 3 frames consecutivos y 1 s de enfriamiento.
 | Recall, limpio | **100%** (10/10) | En muestra; el usuario grabó esos audios |
 | Recall, ruido no visto | **100%** (10/10) | Validación dejando un audio fuera, ruido MUSAN de otra semilla |
 | Recall, campo lejano (3 m) | **100%** (10/10) | Simulado: RIR de 0,5 s, paso bajo 5 kHz, -18 dBFS |
-| Falsos positivos | **0,151 FA/h** | 8 eventos en 53,03 h de habla real |
+| Falsos positivos | **0,113 FA/h** | 6 eventos en 53,03 h de habla real |
+| Especificidad: "celeste" en frase normal | **0 de 30 disparan** | 30 frases TTS con "celeste"/"hey" (máx 0,2198) |
 | Silencio digital (30 min) | **0 activaciones** | Probabilidad máxima 0,0799 |
 | Ruido térmico -70 dBFS (30 min) | **0 activaciones** | Probabilidad máxima 0,0070 |
 
@@ -35,9 +36,9 @@ Curva de falsos positivos del modelo desplegado:
 |---|---|
 | 0,50 | 0,396 |
 | 0,70 | 0,302 |
-| 0,80 | 0,245 |
-| **0,90** | **0,151** |
-| 0,95 | 0,113 |
+| 0,80 | 0,113 |
+| **0,90** | **0,113** |
+| 0,95 | 0,075 |
 
 Criterio del proyecto: ≥95% recall y ≤0,5 FA/h. **Cumple a partir de umbral 0,8.**
 
@@ -51,7 +52,8 @@ Criterio del proyecto: ≥95% recall y ≤0,5 FA/h. **Cumple a partir de umbral 
 | Few-shot sin negativos difíciles | 87,5% | 4,469 | Acierta pero dispara 4,5 veces por hora |
 | Few-shot + minado | 87,5% | 0,094 | El minado baja los falsos positivos 47× |
 | Few-shot + ruido | 100% | 0,867 | Mejor recall, peor precisión |
-| **Few-shot + ruido + reminado** | **100%** | **0,151** | Punto de operación final |
+| Few-shot + ruido + reminado | 100% | 0,151 | Cerca, pero disparaba con "celeste" en una frase |
+| **+ negativos de frase ("hey, ¿viste a Celeste?")** | **100%** | **0,113** | Punto de operación final: 0/30 frases disparan |
 
 ## Comparación con TTS nunca visto (control de motor)
 

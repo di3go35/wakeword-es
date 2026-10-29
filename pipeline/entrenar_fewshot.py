@@ -38,6 +38,8 @@ def main(argv=None) -> int:
     p.add_argument("--semilla", type=int, default=20261026)
     p.add_argument("--neg-dificiles", default=None,
                    help="npy con negativos minados (sin ellos el modelo dispara 4,5 veces por hora)")
+    p.add_argument("--neg-extra", default=None,
+                   help="carpeta de características con frases que NO deben activar (p. ej. 'celeste' en una frase)")
     p.add_argument("--peso-dificiles", type=float, default=3.0,
                    help="cuántas veces se repiten los negativos difíciles en el entrenamiento")
     args = p.parse_args(argv)
@@ -50,6 +52,18 @@ def main(argv=None) -> int:
         repeticiones = max(1, int(round(args.peso_dificiles)))
         x_neg = np.concatenate([x_neg] + [x_dif] * repeticiones)
         print(f"negativos difíciles: {len(x_dif)} x{repeticiones}")
+
+    if args.neg_extra:
+        extra = []
+        for npy in sorted(Path(args.neg_extra).glob("*.npy")):
+            d = np.load(npy)
+            if d.shape[0] >= VENTANA and d.shape[1] == DIM:
+                w = np.lib.stride_tricks.sliding_window_view(d, (VENTANA, DIM))[:, 0]
+                extra.append(w.astype(np.float32))
+        if extra:
+            x_neg_extra = np.concatenate(extra)
+            x_neg = np.concatenate([x_neg, x_neg_extra])
+            print(f"negativos de frase (no deben activar): {len(x_neg_extra)} ventanas")
 
     if args.reales_npy:
         x_real = np.load(args.reales_npy).astype(np.float32)

@@ -57,6 +57,8 @@ quedó abierto está nombrado como pendiente al final.
 
 | 41 | Las tres condiciones del criterio, medidas | Limpio: 100% (en muestra). Ruido no visto: 100% (dejando un audio fuera). Campo lejano 3 m simulado (RIR 0,5 s, paso bajo 5 kHz, -18 dBFS): 100%. Silencio digital 30 min: 0 activaciones (máx 0,0799). Ruido térmico -70 dBFS 30 min: 0 activaciones (máx 0,0070) | El campo lejano es **simulado**, no grabado a 3 m con un móvil: es una condición aproximada. El silencio sí es exacto: ceros y ruido térmico reales. La comprobación definitiva de las tres condiciones necesita grabaciones nuevas en cada condición | Cerrada |
 
+| 42 | Los negativos de frase mejoran las dos métricas | Añadir 30 frases con «celeste» o «hey» (302 ventanas) que no deben activar baja la especificidad de 4/30 disparos a **0/30** y, además, los falsos positivos de 0,151 a **0,113 FA/h**, con el recall intacto (100%). Sirve incluso un negativo sintético, porque el fallo no es de dominio sino de patrón acústico | El modelo se disparaba con «hey, ¿viste a Celeste?»: el «hey» y el nombre caben en la misma ventana de 2,04 s. Contrarrestarlo con ejemplos cuesta nada y no degrada el recall | Cerrada |
+
 ## Pendientes (nombrados como pendientes, no decididos)
 
 1. **La frase exacta.** Se elegirá por medición en la fase 3; hoy no hay frase decidida.

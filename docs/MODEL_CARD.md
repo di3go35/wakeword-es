@@ -18,6 +18,7 @@ activación **"hey celeste"**. No procesa audio: recibe las 96 dimensiones que p
 | Positivos de voz real | 2.632 ventanas de 10 grabaciones del usuario, aumentadas ×10 (canal, nivel, reverberación, ruido MUSAN) |
 | Negativos reales | 151.396 ventanas de Common Voice es 27.0, hablantes disjuntos del test |
 | Negativos difíciles | 3.831 ventanas minadas dos veces sobre hablantes de entrenamiento |
+| Negativos de frase | 302 ventanas de 30 frases con "celeste" o "hey" que no deben activar |
 
 Etiquetado: una ventana es positiva **solo si contiene la frase completa** (2,04 s de audio). Las
 ventanas que cortan la frase entran como negativas.
@@ -29,8 +30,9 @@ ventanas que cortan la frase entran como negativas.
 | Recall limpio | 100% (10/10, en muestra) |
 | Recall con ruido no visto | 100% (10/10, dejando un audio fuera) |
 | Recall campo lejano 3 m (simulado) | 100% (10/10) |
-| Falsos positivos @0,9 | 0,151 FA/h |
-| Falsos positivos @0,8 | 0,245 FA/h |
+| Falsos positivos @0,9 | **0,113 FA/h** (6 eventos en 53 h) |
+| Falsos positivos @0,8 | 0,113 FA/h |
+| Especificidad ("celeste" en frase normal) | 0 de 30 disparan |
 | Silencio digital 30 min | 0 activaciones |
 | Ruido térmico -70 dBFS 30 min | 0 activaciones |
 
