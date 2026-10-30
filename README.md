@@ -24,8 +24,8 @@ vio, en 10 condiciones de acento.
 
 Criterio del proyecto: ≥95% de recall con ≤0,5 FA/h. **El recetario few-shot cumple el criterio en limpio y en campo lejano (100% de recall, 0,113 FA/h) y
 **no lo cumple en ruido** (66% de recall por intento). El zero-shot no cumple ninguno de los dos porque
-no reconoce a una persona.** Curva completa de falsos positivos: 0,396 @0,5 · 0,302 @0,7 · 0,245 @0,8 · 0,151 @0,9 ·
-0,113 @0,95.
+no reconoce a una persona.** Curva completa de falsos positivos: 0,396 @0,5 · 0,302 @0,7 · 0,245 @0,8 · 0,151 @0,9.
+Con la compuerta de energía a −45 dBFS y el modelo final: **0,094 FA/h @0,9** (5 eventos en 53 h).
 
 ## Los tres hallazgos que ordenan todo
 

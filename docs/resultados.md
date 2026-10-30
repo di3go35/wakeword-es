@@ -47,10 +47,26 @@ SNR: falla 45% a SNR <0 dB, 38% entre 0 y 10 dB y 26% por encima de 10 dB — es
 | −60 dBFS fijo | 100% | 100% | 66% |
 | adaptativo (suelo local + 8 dB) | 100% | 100% | 66% |
 
-La compuerta **no cuesta recall en ninguna condición** y quita los disparos en silencio digital (12 → 11
-eventos en los 10 clips limpios; el evento eliminado estaba en un frame a −120 dBFS, silencio exacto).
-El riesgo que el plan advertía —que el piso rompiera el campo lejano— **no se materializa a −45**: a
-−35 sí (recall lejano 100% → 40%). Recomendación: piso **−45 dBFS**.
+La compuerta **no cuesta recall en ninguna condición** y quita disparos en silencio digital (12 → 11
+eventos en los 10 clips limpios; el eliminado estaba en un frame a −120 dBFS, silencio exacto). El
+riesgo que el plan advertía —que el piso rompiera el campo lejano— **no se materializa a −45**: a −35
+sí (recall lejano 100% → 40%). Recomendación: piso **−45 dBFS**.
+
+**Efecto sobre las 53 h de habla real** (job `wakeword-compuerta`, 2026-10-29 21:38, 37.106 clips):
+
+| Piso | Eventos | FA/h |
+|---|---|---|
+| sin compuerta | 6 | 0,113 |
+| −60 dBFS | 5 | 0,094 |
+| −50 dBFS | 5 | 0,094 |
+| **−45 dBFS** | **5** | **0,094** |
+| −40 dBFS | 5 | 0,094 |
+| −35 dBFS | 4 | 0,075 |
+
+Energía de los frames que disparan sin compuerta: p5 **−74,8** dBFS · mediana −27,5 · p95 −11,8. Es
+decir, el evento eliminado vivía por debajo de −74 dBFS: silencio. La mejora de 0,019 FA/h es real pero
+pequeña; **el valor de la compuerta no está en la media, está en los 30 minutos de silencio absoluto**
+(0 activaciones, ya lo garantizaba el umbral, ahora también el piso).
 | Silencio digital (30 min) | **0 activaciones** | Probabilidad máxima 0,0799 |
 | Ruido térmico -70 dBFS (30 min) | **0 activaciones** | Probabilidad máxima 0,0070 |
 

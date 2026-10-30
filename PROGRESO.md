@@ -45,7 +45,7 @@ Registro cronológico del trabajo autónomo. Horas en UTC (tu hora = UTC-5).
 | — | Compuerta a −45 dBFS: limpio 100%, lejano 3 m **100%**, ruido 66% (igual que sin compuerta). A −35 el lejano cae a 40%: descartado por medición. |
 | — | **Corrección importante**: el 100% de recall en ruido era la mediana de puntuación, no la regla operativa. Con 3 frames sobre 0,9: **66%**. Sin compuerta también 66%: no es la compuerta. No depende del SNR (fallos hasta +19 dB). |
 | — | `docs/resultados.md`, `README.md` y `MODEL_CARD.md` corregidos con las dos cifras y el desglose por SNR. Decisiones 43 y 44. |
-| — | Job `wakeword-compuerta` midiendo el FA/h con compuerta sobre las 53 h (decodifica audio, lento; queda corriendo bajo systemd). |
+| 21:38 | Job `wakeword-compuerta` terminado: FA/h **0,113 → 0,094** con compuerta a −45 dBFS (6 → 5 eventos en 53,03 h). A −35 baja a 0,075 pero rompe el campo lejano: descartado. Sin costo de recall. |
 | — | Fase 6.2: `pipeline/calibrar.py`. Sobre 8,19 h de habla real como «entorno» recomienda umbral **0,30** con 0,244 FA/h para un objetivo de 0,5. Elige el umbral **más bajo** que cumple el objetivo, para maximizar recall. Ejemplo en `benchmark/calibracion_ejemplo.json`. |
 
 ## Pendiente inmediato
