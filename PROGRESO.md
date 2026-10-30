@@ -48,6 +48,8 @@ Registro cronológico del trabajo autónomo. Horas en UTC (tu hora = UTC-5).
 | 21:38 | Job `wakeword-compuerta` terminado: FA/h **0,113 → 0,094** con compuerta a −45 dBFS (6 → 5 eventos en 53,03 h). A −35 baja a 0,075 pero rompe el campo lejano: descartado. Sin costo de recall. |
 | — | Fase 6.2: `pipeline/calibrar.py`. Sobre 8,19 h de habla real como «entorno» recomienda umbral **0,30** con 0,244 FA/h para un objetivo de 0,5. Elige el umbral **más bajo** que cumple el objetivo, para maximizar recall. Ejemplo en `benchmark/calibracion_ejemplo.json`. |
 
+| — | Escrito `ESTADO.md`: documento de traspaso con fase actual, números, comandos, convención systemd y las 10 trampas que costaron tiempo. |
+
 ## Pendiente inmediato
 
 1. **Recall en ruido (66%)**: es la única condición que no cumple el criterio. Necesita más

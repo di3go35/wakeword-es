@@ -87,6 +87,8 @@ y este repositorio aporta los scripts, las particiones congeladas y los manifies
 
 ## Documentación
 
+**Si retomas el proyecto, empieza por [`ESTADO.md`](ESTADO.md)**: fase actual, números vigentes, comandos y trampas.
+
 [`PLAN.md`](PLAN.md) · [`DECISIONES.md`](DECISIONES.md) (39 decisiones con criterio y descarte) ·
 [`ARQUITECTURA.md`](ARQUITECTURA.md) · [`INVENTARIO.md`](INVENTARIO.md) ·
 [`FRASE.md`](FRASE.md) · [`PROGRESO.md`](PROGRESO.md) ·
